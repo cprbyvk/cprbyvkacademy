@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CPR Indicator Scanner | CPR by VK Academy</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='32' y2='32' gradientUnits='userSpaceOnUse'><stop stop-color='%236366F1'/><stop offset='1' stop-color='%23A855F7'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='16' y='22' font-family='Arial, Helvetica, sans-serif' font-weight='700' font-size='14' fill='white' text-anchor='middle'>VK</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+  // Set theme before paint to avoid a flash of the wrong mode.
+  (function(){
+    let saved = null;
+    try { saved = localStorage.getItem('vk-scanner-theme'); } catch(e){}
+    document.documentElement.setAttribute('data-theme', saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+  })();
+</script>
+<style>
+  :root{
+    --bg:#0A0B12; --panel:#12161f; --panel2:#171c27; --line:#2a3244;
+    --text:#f2f4f9; --muted:#a7b0c2; --label:#fff; --indigo:#6366F1; --purple:#A855F7;
+    --green:#37CC51; --red:#C22525; --blue:#3757CC; --orange:#D95F23;
+    --accent-grad: linear-gradient(90deg, var(--indigo), var(--purple));
+  }
+  html[data-theme="light"]{
+    --bg:#FFFFFF; --panel:#FFFFFF; --panel2:#F3F4F8; --line:#E1E4EC;
+    --text:#111827; --muted:#5B6178; --label:#1F2333; --indigo:#6366F1; --purple:#A855F7;
+    --green:#16A34A; --red:#D6453B; --blue:#3757CC; --orange:#C25A16;
+  }
+  body, .card, input, select, button, .toggle, .upload-slot{
+    transition:background-color .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .theme-toggle{
+    width:40px; height:40px; min-width:40px; min-height:40px; max-width:40px;
+    border-radius:50%; background:var(--panel2); border:1px solid var(--line); color:var(--text);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+    transition:border-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .theme-toggle:hover{ border-color:var(--indigo); color:var(--indigo); box-shadow:0 0 0 3px rgba(99,102,241,.18); }
+  .theme-toggle svg{width:18px;height:18px;}
+  .theme-toggle .icon-moon{display:none;}
+  html[data-theme="light"] .theme-toggle .icon-sun{display:none;}
+  html[data-theme="light"] .theme-toggle .icon-moon{display:block;}
+  @media(max-width:640px){
+    .theme-toggle{width:36px;height:36px;min-width:36px;min-height:36px;max-width:36px;}
+  }
+  @media(max-width:900px){ .theme-toggle{ margin-left:auto; } }
+  .hamburger-btn{
+    display:none; width:34px;height:34px;min-width:34px;max-width:34px;min-height:34px;max-height:34px;flex:none;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--text);align-items:center;justify-content:center;
+    cursor:pointer;padding:0;
+  }
+  .hamburger-btn:hover{border-color:var(--indigo);color:var(--indigo);}
+  @media(max-width:900px){ .hamburger-btn{display:flex;} }
+  nav.site-nav{display:flex; align-items:center; gap:20px; margin-left:26px;}
+  nav.site-nav a{font-size:13px; font-weight:600; color:var(--muted); white-space:nowrap; text-decoration:none;}
+  nav.site-nav a:hover{color:var(--text);}
+  .nav-dropdown{ position:relative; }
+  .nav-dropdown-btn{
+    display:flex; align-items:center; gap:4px; background:none; border:none; cursor:pointer;
+    font-size:13px; font-weight:600; color:var(--text-dim); font-family:inherit; padding:0;
+  }
+  .nav-dropdown-btn:hover{ color:var(--text); }
+  .nav-dropdown-btn svg{ width:12px; height:12px; transition:transform .15s ease; }
+  .nav-dropdown.open .nav-dropdown-btn svg{ transform:rotate(180deg); }
+  .nav-dropdown-menu{
+    display:none; position:absolute; top:calc(100% + 14px); right:0; min-width:170px;
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    box-shadow:0 12px 30px rgba(0,0,0,.15); padding:6px; z-index:1001;
+  }
+  .nav-dropdown.open .nav-dropdown-menu{ display:block; }
+  .nav-dropdown-menu a{
+    display:block; padding:9px 12px; font-size:13.5px; font-weight:600; color:var(--text);
+    border-radius:6px; white-space:nowrap;
+  }
+  .nav-dropdown-menu a:hover{ background:var(--panel-2); color:var(--indigo); }
+  .soon-link{ display:inline-flex; align-items:center; gap:5px; opacity:.7; }
+  @media(max-width:900px){ nav.site-nav{display:none;} }
+  .hamburger-btn svg{width:16px;height:16px;}
+  .hamburger-btn .icon-x{display:none;}
+  .hamburger-btn.open .icon-bars{display:none;}
+  .hamburger-btn.open .icon-x{display:block;}
+  .site-menu{
+    display:none;flex-direction:column;position:fixed;left:0;right:0;top:0;z-index:999;background:var(--bg);
+    border-bottom:1px solid var(--line);padding:8px 24px 16px;max-height:80vh;overflow-y:auto;
+  }
+  .site-menu.open{display:flex;}
+  .site-menu a{padding:13px 4px;font-size:14.5px;font-weight:600;color:var(--text);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;text-decoration:none;}
+  .site-menu a:last-child{border-bottom:none;}
+  .mobile-about-toggle{width:100%;background:none;border:none;padding:13px 4px;font-size:14.5px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font-family:inherit;cursor:pointer;text-align:left;}
+  .mobile-about-toggle svg{width:14px;height:14px;transition:transform .15s ease;flex-shrink:0;}
+  .mobile-about-toggle.open svg{transform:rotate(180deg);}
+  .mobile-about-submenu{display:none;flex-direction:column;padding-left:14px;}
+  .mobile-about-submenu.open{display:flex;}
+  .mobile-about-submenu a{padding:12px 4px;font-size:13.5px;font-weight:600;color:var(--text-dim);border-bottom:1px solid var(--line);}
+  .mobile-about-submenu a:last-child{border-bottom:none;}
+  .soon-link{opacity:.7;}
+  .soon-tag{
+    font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--indigo);background:rgba(99,102,241,.12);padding:2px 6px;border-radius:8px;
+  }
+  *{box-sizing:border-box;}
+  a{color:inherit; text-decoration:none;}
+  html,body{overflow-x:hidden;max-width:100%;height:100%;}
+  .top-bar{
+    position:fixed; top:0; left:0; right:0; z-index:1000; background:var(--bg);
+    border-bottom:1px solid var(--line); padding:14px 24px;
+    display:flex; align-items:center; gap:10px;
+    -webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  }
+  @media(min-width:901px){ .top-bar{ justify-content:center; } }
+  .logo-box{
+    width:30px;height:30px;border-radius:8px;background:var(--accent-grad);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .logo-vk{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#fff;font-size:13.5px;letter-spacing:-0.02em;}
+  .logo-box svg{width:16px;height:16px;}
+  .brand-line{display:flex;flex-direction:column;align-items:center;line-height:1.15;}
+  .brand-name{font-weight:700;font-size:15px;color:var(--text);}
+  .brand-sub{font-size:10px;color:var(--muted);font-family:ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:'Segoe UI',Inter,Roboto,-apple-system,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  ::-webkit-scrollbar{height:10px;width:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--accent-grad);border-radius:5px;}
+  * { scrollbar-width: thin; scrollbar-color: var(--indigo) var(--panel2); }
+  .wrap{max-width:1200px;margin:0 auto;padding:36px 20px 0;width:100%;flex:1;display:flex;flex-direction:column;}
+  header{text-align:center;margin-bottom:28px;}
+  .eyebrow{
+    display:inline-block;
+    font-size:12px;color:var(--label);border:1.5px solid var(--indigo);
+    padding:5px 14px;border-radius:20px;margin-bottom:16px;font-weight:700;
+  }
+  h1{
+    font-size:32px;margin:0 0 4px;font-weight:800;letter-spacing:-0.01em;
+    background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  h1 .accent{
+    background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub{color:var(--muted);font-size:14px;max-width:640px;margin:0 auto;line-height:1.6;}
+  .page-tagline{font-size:13px;font-weight:600;color:var(--indigo);margin:0 0 10px;}
+
+  .upload-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:22px;margin:24px 0;
+  }
+  .upload-card-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .upload-card h2{font-size:15px;margin:0;font-weight:700;}
+  .upload-card p.upload-hint{color:var(--muted);font-size:12.5px;margin:0 0 16px;}
+
+  .upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:4px;}
+  @media(max-width:800px){.upload-grid{grid-template-columns:1fr;}}
+  .upload-slot{
+    border:1.5px dashed var(--line);border-radius:8px;padding:16px;text-align:center;
+    cursor:pointer;transition:border-color .15s;display:block;
+  }
+  .upload-slot:hover{border-color:var(--indigo);}
+  .upload-slot.filled{border-style:solid;border-color:var(--indigo);background:rgba(99,102,241,.08);}
+  .upload-slot .lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+  .upload-slot .fname{font-size:12.5px;margin-top:8px;color:var(--text);word-break:break-all;}
+  .upload-slot input{display:none;}
+
+  .fo-row{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .fo-left{display:flex;align-items:center;gap:10px;}
+  .toggle{
+    position:relative;width:42px;height:24px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:20px;cursor:pointer;flex-shrink:0;
+  }
+  .toggle.on{background:var(--accent-grad);border-color:var(--indigo);}
+  .toggle .knob{
+    position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;transition:left .15s;
+  }
+  .toggle.on .knob{left:20px;}
+  .fo-label{font-size:13px;font-weight:600;}
+  .fo-status{font-size:11.5px;color:var(--muted);}
+  .fo-upload-btn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    padding:8px 14px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:600;
+  }
+  .fo-upload-btn:hover{border-color:var(--indigo);}
+
+  .runbtn{
+    display:block;width:100%;margin-top:18px;padding:13px;border-radius:8px;border:none;
+    background:var(--accent-grad);color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  .runbtn:disabled{background:var(--panel2);color:var(--muted);cursor:not-allowed;}
+  .runbtn:not(:disabled):hover{filter:brightness(1.1);}
+
+  .status{font-size:12.5px;color:var(--muted);margin-top:10px;text-align:center;}
+  .status.error{color:var(--red);}
+
+  .search-row{display:flex;gap:10px;margin:20px 0 -6px;}
+  .search-row input{
+    flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:10px 14px;border-radius:8px;font-size:13px;
+  }
+
+  .scanner-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;}
+  @media(max-width:800px){.scanner-grid{grid-template-columns:1fr;}}
+
+  .scanner-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;
+  }
+  .scanner-card.placeholder{opacity:.5;}
+  .scanner-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .scanner-head h3{font-size:14px;margin:0;font-weight:700;}
+  .count-pill{
+    background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+    padding:2px 10px;font-size:11.5px;font-weight:700;color:var(--muted);
+  }
+  table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:380px;}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  th{
+    text-align:left;color:var(--muted);font-weight:600;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.04em;padding:6px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  th.num, td.num{text-align:right;}
+  td{padding:8px 4px;border-bottom:1px solid var(--line);font-family:ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;}
+  tr:last-child td{border-bottom:none;}
+  td.stock{font-family:inherit;font-weight:700;}
+  td.ltp.up{color:var(--green);}
+  td.ltp.down{color:var(--red);}
+  .badge{
+    display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;
+  }
+  .badge.narrow{background:rgba(55,204,81,.15);color:var(--green);}
+  .badge.toonarrow{background:rgba(73,201,79,.18);color:#49C94F;}
+  .empty-note{color:var(--muted);font-size:12.5px;padding:14px 4px;text-align:center;}
+
+  footer.site-footer{
+    text-align:center;margin:auto auto 0;
+    padding:24px 12px 22px;border-top:1px solid var(--line);width:100%;
+  }
+  footer.site-footer .footer-brand{ display:inline-flex; align-items:center; gap:10px; margin-bottom:14px; text-decoration:none; }
+  footer.site-footer .legal-links{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+  footer.site-footer .legal-links a{ font-size:13px; font-weight:600; color:var(--muted); }
+  footer.site-footer .legal-links a:hover{ color:var(--indigo); }
+  footer.site-footer .footer-disclaimer{ font-size:12px; color:var(--muted); max-width:560px; margin:0 auto 8px; line-height:1.65; }
+  footer.site-footer .footer-disclaimer a{ color:var(--indigo); font-weight:600; text-decoration:underline; }
+  footer.site-footer .credit-line-footer{ font-size:11.5px; color:var(--muted); margin:0 0 8px; }
+  footer.site-footer .credit-line-footer a{ color:var(--indigo); font-weight:600; }
+  footer.site-footer .footer-copyright{ font-size:11.5px; color:var(--muted); margin:0; }
+
+  @media(max-width:480px){
+    .wrap{padding:22px 12px 0;}
+    h1{font-size:24px;}
+    .sub{font-size:12.5px;}
+    .upload-card{padding:16px;}
+    .upload-slot{padding:12px;}
+    .scanner-card{padding:12px 14px;}
+    .runbtn{padding:14px;font-size:13px;}
+    .fo-upload-btn{padding:9px 12px;font-size:12px;}
+  }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+    <div class="logo-box">
+      <span class="logo-vk">VK</span>
+    </div>
+    <div class="brand-line">
+      <span class="brand-name">CPR by VK</span>
+      <span class="brand-sub">Academy</span>
+    </div>
+  </a>
+  <nav class="site-nav">
+    <a href="javascript:void(0)" class="soon-link">Courses <span class="soon-tag">Soon</span></a>
+    <a href="cpr-calculator">CPR Calculator</a>
+    <a href="narrow-cpr-scanner">Narrow CPR Scanner</a>
+    <a href="cpr-indicator-scanner">CPR Indicator Scanner</a>
+    <a href="free-trading-journal">Free Trading Journal</a>
+    <a href="javascript:void(0)" class="soon-link">CPR Book <span class="soon-tag">Soon</span></a>
+    <div class="nav-dropdown" id="aboutDropdown">
+      <button class="nav-dropdown-btn" onclick="toggleAboutDropdown()" type="button">
+        About
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/#about">About VK</a>
+        <a href="https://wa.me/919952697792" target="_blank" rel="noopener noreferrer">Talk to VK</a>
+        <a href="/#faq">FAQs</a>
+        <a href="/#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Toggle menu" title="Menu">
+    <svg class="icon-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    <svg class="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+</div>
+<div class="site-menu" id="mobileMenu">
+  <a href="javascript:void(0)" class="soon-link">Courses <span class="soon-tag">Soon</span></a>
+  <a href="cpr-calculator">CPR Calculator</a>
+  <a href="narrow-cpr-scanner">Narrow CPR Scanner</a>
+  <a href="cpr-indicator-scanner">CPR Indicator Scanner</a>
+  <a href="free-trading-journal">Free Trading Journal</a>
+  <a href="javascript:void(0)" class="soon-link">CPR Book <span class="soon-tag">Soon</span></a>
+  <div class="mobile-about-wrap">
+    <button class="mobile-about-toggle" id="mobileAboutToggle" onclick="toggleMobileAbout()" type="button">
+      About
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="mobile-about-submenu" id="mobileAboutSubmenu">
+      <a href="/#about">About VK</a>
+      <a href="https://wa.me/919952697792" target="_blank" rel="noopener noreferrer">Talk to VK</a>
+      <a href="/#faq">FAQs</a>
+      <a href="/#contact">Contact</a>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Educational Tool</div>
+    <h1>CPR Indicator Scanner</h1>
+    <p class="page-tagline">CPR by VK Academy</p>
+    <div class="sub">Upload the downloaded Bhavcopy CSV files below, oldest to newest. Everything runs in your browser — no data leaves your machine. Best used after today's Bhavcopy is out, to prepare your watchlist for the next trading day.</div>
+  </header>
+
+  <div class="upload-card">
+    <div class="upload-card-head">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 11l6-6 6 6"/><path d="M4 21h16"/></svg>
+      <h2>Upload Bhavcopy Files</h2>
+    </div>
+    <p class="upload-hint">Most recent trading day first. Today's CPR uses Day&#8209;1's H/L/C; the relationship checks compare it against Day&#8209;2 and Day&#8209;3.</p>
+    <div class="upload-grid">
+      <label class="upload-slot" id="slot1">
+        <div class="lbl">Day -1 (most recent)</div>
+        <div class="fname" id="fname1">Click to upload CSV</div>
+        <input type="file" accept=".csv" onchange="handleFile(event, 1)">
+      </label>
+      <label class="upload-slot" id="slot2">
+        <div class="lbl">Day -2</div>
+        <div class="fname" id="fname2">Click to upload CSV</div>
+        <input type="file" accept=".csv" onchange="handleFile(event, 2)">
+      </label>
+      <label class="upload-slot" id="slot3">
+        <div class="lbl">Day -3</div>
+        <div class="fname" id="fname3">Click to upload CSV</div>
+        <input type="file" accept=".csv" onchange="handleFile(event, 3)">
+      </label>
+    </div>
+
+    <div class="fo-row">
+      <div class="fo-left">
+        <div class="toggle on" id="foToggle" onclick="toggleFO()"><div class="knob"></div></div>
+        <div>
+          <div class="fo-label">F&amp;O Stocks Only</div>
+          <div class="fo-status" id="foStatus">F&amp;O Stocks Only — nse_derivatives_individual_securities.csv (built-in, NSE-verified 19 Jun 2026) — 210 underlyings</div>
+        </div>
+      </div>
+      <button class="fo-upload-btn" onclick="document.getElementById('foInput').click()">Upload Newer F&amp;O List</button>
+      <input type="file" id="foInput" accept=".csv" style="display:none" onchange="handleFOFile(event.target.files[0])">
+    </div>
+
+    <button class="runbtn" id="runBtn" onclick="runScanners()" disabled>Upload at least 3 CSV files to run scanners</button>
+    <div class="status" id="statusMsg"></div>
+  </div>
+
+  <div class="search-row" id="searchRow" style="display:none;">
+    <input type="text" id="searchBox" placeholder="Search stock..." oninput="applySearch()">
+  </div>
+
+  <div class="scanner-grid" id="scannerGrid" style="display:none;">
+    <div class="scanner-card">
+      <div class="scanner-head"><h3>Narrow CPR Scanner</h3><span class="count-pill" id="count-narrow">0</span></div>
+      <div class="table-scroll"><table><thead><tr><th>Stock</th><th class="num">LTP / Close</th><th class="num">Day High</th><th class="num">Day Low</th><th class="num">Width %</th></tr></thead><tbody id="tbl-narrow"></tbody></table></div>
+    </div>
+    <div class="scanner-card">
+      <div class="scanner-head"><h3>Ascending / Descending CPR Scanner</h3><span class="count-pill" id="count-trend">0</span></div>
+      <div class="table-scroll"><table><thead><tr><th>Stock</th><th class="num">LTP</th><th>Direction</th></tr></thead><tbody id="tbl-trend"></tbody></table></div>
+    </div>
+    <div class="scanner-card">
+      <div class="scanner-head"><h3>Trend Reversal CPR Scanner</h3><span class="count-pill" id="count-reversal">0</span></div>
+      <div class="table-scroll"><table><thead><tr><th>Stock</th><th class="num">LTP</th><th>Setup</th></tr></thead><tbody id="tbl-reversal"></tbody></table></div>
+    </div>
+    <div class="scanner-card">
+      <div class="scanner-head"><h3>Virgin CPR Scanner</h3><span class="count-pill" id="count-virgin">0</span></div>
+      <div class="table-scroll"><table><thead><tr><th>Stock</th><th class="num">LTP</th><th class="num">Width %</th></tr></thead><tbody id="tbl-virgin"></tbody></table></div>
+    </div>
+    <div class="scanner-card">
+      <div class="scanner-head"><h3>Inside / Outside CPR Scanner</h3><span class="count-pill" id="count-inout">0</span></div>
+      <div class="table-scroll"><table><thead><tr><th>Stock</th><th class="num">LTP</th><th>Type</th></tr></thead><tbody id="tbl-inout"></tbody></table></div>
+    </div>
+    <div class="scanner-card">
+      <div class="scanner-head"><h3>Camarilla S3/R3 Inside CPR Scanner</h3><span class="count-pill" id="count-camarilla">0</span></div>
+      <div class="table-scroll"><table><thead><tr><th>Stock</th><th class="num">LTP</th><th class="num">Width %</th></tr></thead><tbody id="tbl-camarilla"></tbody></table></div>
+    </div>
+    <div class="scanner-card placeholder">
+      <div class="scanner-head"><h3>Developing CPR Scanner</h3><span class="count-pill">—</span></div>
+      <div class="empty-note">Waiting on the "Developing CPR" definition from your material.</div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <a href="/" class="footer-brand" aria-label="CPR by VK Academy home">
+      <div class="logo-box"><span class="logo-vk">VK</span></div>
+      <div class="brand-line">
+        <span class="brand-name">CPR by VK</span>
+        <span class="brand-sub">Academy</span>
+      </div>
+    </a>
+    <div class="legal-links">
+      <a href="privacy-policy">Privacy Policy</a>
+      <a href="terms-and-conditions">Terms &amp; Conditions</a>
+      <a href="refund-policy">Refund Policy</a>
+      <a href="disclaimer">Disclaimer</a>
+      <a href="grievance">Grievance</a>
+    </div>
+    <p class="footer-disclaimer"><b>Disclaimer:</b> Educational content only. Not investment, trading, or financial advice. Not SEBI-registered. See the <a href="disclaimer">full disclaimer</a> for complete terms.</p>
+    <p class="credit-line-footer">Inspired by CPR concepts taught by Gomathi Shankar — <a href="https://www.cprbykgs.com" target="_blank" rel="noopener noreferrer">CPR by KGS</a></p>
+    <p class="footer-copyright">© <span id="copyYear">2026</span> CPR by VK · CPR by VK Academy. All rights reserved.</p>
+  </footer>
+</div>
+
+<script>
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('vk-scanner-theme', next); } catch(e){}
+}
+
+function toggleAboutDropdown(){
+  document.getElementById('aboutDropdown').classList.toggle('open');
+}
+function toggleMobileAbout(){
+  document.getElementById('mobileAboutToggle').classList.toggle('open');
+  document.getElementById('mobileAboutSubmenu').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('aboutDropdown');
+  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+});
+
+function positionMobileMenu(){
+  const header = document.querySelector('.top-bar');
+  const menu = document.getElementById('mobileMenu');
+  if (header && menu) menu.style.top = header.offsetHeight + 'px';
+}
+function positionWrap(){
+  const header = document.querySelector('.top-bar');
+  const wrap = document.querySelector('.wrap');
+  if (header && wrap) wrap.style.paddingTop = (header.offsetHeight + 24) + 'px';
+}
+function toggleMobileMenu(){
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  if (open) positionMobileMenu();
+}
+window.addEventListener('resize', () => { positionMobileMenu(); positionWrap(); });
+positionWrap();
+
+let files = { 1: null, 2: null, 3: null };
+let parsedData = { 1: null, 2: null, 3: null };
+
+// Built-in F&O universe: nse_derivatives_individual_securities.csv (NSE-verified 19 Jun 2026)
+const BUILTIN_FO_SYMBOLS = ['360ONE','ABB','APLAPOLLO','AUBANK','ADANIENSOL','ADANIENT','ADANIGREEN','ADANIPORTS','ADANIPOWER','ABCAPITAL','ALKEM','AMBER','AMBUJACEM','ANGELONE','APOLLOHOSP','ASHOKLEY','ASIANPAINT','ASTRAL','AUROPHARMA','DMART','AXISBANK','BSE','BAJAJ-AUTO','BAJFINANCE','BAJAJFINSV','BAJAJHLDNG','BANDHANBNK','BANKBARODA','BANKINDIA','BDL','BEL','BHARATFORG','BHEL','BPCL','BHARTIARTL','BIOCON','BLUESTARCO','BOSCHLTD','BRITANNIA','CGPOWER','CANBK','CDSL','CHOLAFIN','CIPLA','COALINDIA','COCHINSHIP','COFORGE','COLPAL','CAMS','CONCOR','CROMPTON','CUMMINSIND','DLF','DABUR','DALBHARAT','DELHIVERY','DIVISLAB','DIXON','DRREDDY','ETERNAL','EICHERMOT','EXIDEIND','FORCEMOT','NYKAA','FORTIS','GAIL','GVT&D','GMRAIRPORT','GLENMARK','GODFRYPHLP','GODREJCP','GODREJPROP','GRASIM','HCLTECH','HDFCAMC','HDFCBANK','HDFCLIFE','HAVELLS','HEROMOTOCO','HINDALCO','HAL','HINDPETRO','HINDUNILVR','HINDZINC','POWERINDIA','HYUNDAI','ICICIBANK','ICICIGI','ICICIPRULI','IDFCFIRSTB','ITC','INDIANB','IEX','IOC','IRFC','IREDA','INDUSTOWER','INDUSINDBK','NAUKRI','INFY','INOXWIND','INDIGO','JINDALSTEL','JSWENERGY','JSWSTEEL','JIOFIN','JUBLFOOD','KEI','KPITTECH','KALYANKJIL','KAYNES','KFINTECH','KOTAKBANK','LTF','LICHSGFIN','LTM','LT','LAURUSLABS','LICI','LODHA','LUPIN','M&M','MANAPPURAM','MANKIND','MARICO','MARUTI','MFSL','MAXHEALTH','MAZDOCK','MOTILALOFS','MPHASIS','MCX','MUTHOOTFIN','NBCC','NHPC','NMDC','NTPC','NATIONALUM','NESTLEIND','NAM-INDIA','NUVAMA','OBEROIRLTY','ONGC','OIL','PAYTM','OFSS','POLICYBZR','PGEL','PIIND','PNBHOUSING','PAGEIND','PATANJALI','PERSISTENT','PETRONET','PIDILITIND','POLYCAB','PFC','POWERGRID','PREMIERENE','PRESTIGE','PNB','RBLBANK','RECLTD','RADICO','RVNL','RELIANCE','SBICARD','SBILIFE','SHREECEM','SRF','MOTHERSON','SHRIRAMFIN','SIEMENS','SOLARINDS','SONACOMS','SBIN','SAIL','SUNPHARMA','SUPREMEIND','SUZLON','SWIGGY','TATACONSUM','TVSMOTOR','TCS','TATAELXSI','TMPV','TATAPOWER','TATASTEEL','TECHM','FEDERALBNK','INDHOTEL','PHOENIXLTD','TITAN','TORNTPHARM','TRENT','TIINDIA','UNOMINDA','UPL','ULTRACEMCO','UNIONBANK','UNITDSPR','VBL','VEDL','VMM','IDEA','VOLTAS','WAAREEENER','WIPRO','YESBANK','ZYDUSLIFE'];
+const BUILTIN_FO_DATE = '19 Jun 2026';
+
+let foSymbols = new Set(BUILTIN_FO_SYMBOLS); // Set of F&O-eligible symbols
+let foSource = 'builtin'; // 'builtin' or 'uploaded'
+let foActive = true;
+let allResults = null; // cached last run, for search filtering
+
+function extractDateFromFilename(name){
+  const m = name.match(/(\d{2})(\d{2})(\d{4})/);
+  if(m) return new Date(`${m[3]}-${m[2]}-${m[1]}`);
+  const m2 = name.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if(m2) return new Date(`${m2[1]}-${m2[2]}-${m2[3]}`);
+  return null;
+}
+
+function normalizeRows(rows){
+  const map = {};
+  rows.forEach(row => {
+    const keys = Object.keys(row);
+    const get = (names) => {
+      for(const n of names){
+        const key = keys.find(k => k.trim().toUpperCase() === n);
+        if(key && row[key] !== undefined && row[key] !== '') return row[key];
+      }
+      return null;
+    };
+    const symbol = get(['SYMBOL', 'TCKRSYMB']);
+    const series = get(['SERIES', 'SCTYP']);
+    const high = parseFloat(get(['HIGH_PRICE', 'HIGH', 'HGHPRC']));
+    const low = parseFloat(get(['LOW_PRICE', 'LOW', 'LWPRC']));
+    const close = parseFloat(get(['CLOSE_PRICE', 'CLOSE', 'CLSPRC']));
+    const prevClose = parseFloat(get(['PREV_CLOSE', 'PREVCLOSE', 'PRVSCLSGPRC']));
+
+    if(!symbol) return;
+    if(series && series.trim().toUpperCase() !== 'EQ') return;
+    if(isNaN(high) || isNaN(low) || isNaN(close)) return;
+
+    map[symbol.trim().toUpperCase()] = { symbol: symbol.trim().toUpperCase(), high, low, close, prevClose };
+  });
+  return map;
+}
+
+function handleFile(event, slot){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  // Reject duplicate filenames already loaded into a different slot.
+  for(const s of [1, 2, 3]){
+    if(s !== slot && files[s] && files[s].name === file.name){
+      showStatus('"' + file.name + '" is already loaded as Day -' + s + '. The same file cannot be used for two different days.', true);
+      event.target.value = '';
+      return;
+    }
+  }
+
+  const date = extractDateFromFilename(file.name);
+
+  // Enforce descending order: Day -1 must be the most recent, Day -3 the oldest.
+  if(date){
+    const olderSlot = slot - 1;   // e.g. Day -2 relative to Day -3
+    const newerSlot = slot + 1;   // e.g. Day -2 relative to Day -1
+    if(olderSlot >= 1 && files[olderSlot]){
+      const olderDate = extractDateFromFilename(files[olderSlot].name);
+      if(olderDate && date >= olderDate){
+        showStatus('Day -' + slot + ' (' + file.name + ') must be more recent than Day -' + olderSlot + '. Upload files most-recent-first.', true);
+        event.target.value = '';
+        return;
+      }
+    }
+    if(newerSlot <= 3 && files[newerSlot]){
+      const newerDate = extractDateFromFilename(files[newerSlot].name);
+      if(newerDate && date <= newerDate){
+        showStatus('Day -' + slot + ' (' + file.name + ') must be older than Day -' + newerSlot + '. Upload files most-recent-first.', true);
+        event.target.value = '';
+        return;
+      }
+    }
+  }
+
+  files[slot] = file;
+
+  const dateLabel = date ? date.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) : file.name;
+  document.getElementById('fname' + slot).textContent = dateLabel;
+  document.getElementById('slot' + slot).classList.add('filled');
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: h => h.trim(),
+    transform: v => (typeof v === 'string' ? v.trim() : v),
+    complete: function(results){
+      parsedData[slot] = normalizeRows(results.data);
+      const count = Object.keys(parsedData[slot]).length;
+      if(count === 0){
+        showStatus('Parsed ' + file.name + ' but found 0 valid EQ rows — check the file format.', true);
+      } else {
+        showStatus('Loaded ' + count + ' stocks for Day -' + slot + ' (' + dateLabel + ').', false);
+      }
+      checkReady();
+    },
+    error: function(err){
+      showStatus('Could not parse ' + file.name + ': ' + err.message, true);
+    }
+  });
+}
+
+function checkReady(){
+  const ready = parsedData[1] && parsedData[2] && parsedData[3];
+  const btn = document.getElementById('runBtn');
+  btn.disabled = !ready;
+  btn.textContent = ready ? 'Run All Scanners' : 'Upload all 3 files to run scanners';
+  if(ready) showStatus('All 3 files loaded. Click "Run All Scanners" to continue.', false);
+}
+
+function showStatus(msg, isError){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = 'status' + (isError ? ' error' : '');
+}
+
+function handleFOFile(file){
+  if(!file) return;
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: h => h.trim(),
+    transform: v => (typeof v === 'string' ? v.trim() : v),
+    complete: function(results){
+      const keys = results.meta.fields || [];
+      const symbolKey = keys.find(k => /SYMBOL|UNDERLYING/i.test(k));
+      if(!symbolKey){
+        document.getElementById('foStatus').textContent = "Couldn't parse the F&O symbol list — keeping the built-in list.";
+        return;
+      }
+      foSymbols = new Set(
+        results.data.map(r => (r[symbolKey] || '').trim().toUpperCase()).filter(Boolean)
+      );
+      foSource = 'uploaded';
+      document.getElementById('foStatus').textContent = `F&O universe: ${file.name} (uploaded override) — ${foSymbols.size} underlyings`;
+      if(allResults) renderAll(allResults);
+    },
+    error: function(){
+      document.getElementById('foStatus').textContent = "Couldn't parse the F&O symbol list — keeping the built-in list.";
+    }
+  });
+}
+
+function toggleFO(){
+  foActive = !foActive;
+  document.getElementById('foToggle').classList.toggle('on', foActive);
+  const sourceLabel = foSource === 'builtin'
+    ? `nse_derivatives_individual_securities.csv (built-in, NSE-verified ${BUILTIN_FO_DATE})`
+    : `uploaded list`;
+  document.getElementById('foStatus').textContent = foActive
+    ? `F&O Stocks Only — ${sourceLabel} — ${foSymbols.size} underlyings`
+    : `All EQ Stocks — F&O filter off (${sourceLabel} ready, ${foSymbols.size} underlyings)`;
+  if(allResults) renderAll(allResults);
+}
+
+function computeCpr(H, L, C){
+  const pivot = (H + L + C) / 3;
+  const bcRaw = (H + L) / 2;
+  const tcRaw = (pivot - bcRaw) + pivot;
+  const tc = Math.max(tcRaw, bcRaw);
+  const bc = Math.min(tcRaw, bcRaw);
+  const width = tc - bc;
+  const widthPct = (width / pivot) * 100;
+  return { pivot, tc, bc, width, widthPct };
+}
+
+function classifyWidth(widthPct){
+  if(widthPct <= 0.05) return 'Too Narrow';
+  if(widthPct <= 0.10) return 'Narrow';
+  if(widthPct <= 0.20) return 'Medium';
+  if(widthPct <= 0.30) return 'Wide';
+  return 'Too Wide';
+}
+
+function fmt(n){
+  return Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function runScanners(){
+  if(!parsedData[1] || !parsedData[2] || !parsedData[3]){
+    showStatus('Need all 3 files (Day -1, Day -2, Day -3) uploaded first.', true);
+    return;
+  }
+
+  const d1files = parsedData[1];
+  const d2files = parsedData[2];
+  const d3files = parsedData[3];
+
+  const symbols = Object.keys(d1files).filter(s => d2files[s] && d3files[s]);
+  if(symbols.length === 0){
+    showStatus('No matching symbols found across the 3 files — check they cover the same stocks.', true);
+    return;
+  }
+
+  const results = { narrow: [], trend: [], reversal: [], virgin: [], inout: [], camarilla: [] };
+
+  symbols.forEach(sym => {
+    const d1 = d1files[sym], d2 = d2files[sym], d3 = d3files[sym];
+
+    const todayCpr = computeCpr(d1.high, d1.low, d1.close);
+    const ydayCpr = computeCpr(d2.high, d2.low, d2.close);
+    const ltp = d1.close;
+    const ltpUp = d1.prevClose ? d1.close >= d1.prevClose : true;
+
+    const widthLabel = classifyWidth(todayCpr.widthPct);
+    if(widthLabel === 'Narrow' || widthLabel === 'Too Narrow'){
+      results.narrow.push({ sym, ltp, ltpUp, dayHigh: d1.high, dayLow: d1.low, val: todayCpr.widthPct.toFixed(3) + '%', widthLabel });
+    }
+
+    const noOverlap = todayCpr.bc >= ydayCpr.tc || todayCpr.tc <= ydayCpr.bc;
+    const contained = todayCpr.tc <= ydayCpr.tc && todayCpr.bc >= ydayCpr.bc;
+    let direction = null;
+
+    if(noOverlap){
+      direction = todayCpr.bc >= ydayCpr.tc ? 'Ascending' : 'Descending';
+      results.trend.push({ sym, ltp, ltpUp, val: direction });
+      results.inout.push({ sym, ltp, ltpUp, val: 'Outside (' + direction + ')' });
+
+      if(direction === 'Ascending' && ltp < todayCpr.bc){
+        results.reversal.push({ sym, ltp, ltpUp, val: 'Ascending CPR, close below BC' });
+      }
+      if(direction === 'Descending' && ltp > todayCpr.tc){
+        results.reversal.push({ sym, ltp, ltpUp, val: 'Descending CPR, close above TC' });
+      }
+    } else if(contained){
+      results.inout.push({ sym, ltp, ltpUp, val: 'Inside' });
+    }
+
+    const d2OwnCpr = computeCpr(d3.high, d3.low, d3.close);
+    const untouched = d2.low > d2OwnCpr.tc || d2.high < d2OwnCpr.bc;
+    if(untouched){
+      results.virgin.push({ sym, ltp, ltpUp, val: todayCpr.widthPct.toFixed(3) + '%' });
+    }
+
+    const camR3 = d1.close + (d1.high - d1.low) * 1.1 / 4;
+    const camS3 = d1.close - (d1.high - d1.low) * 1.1 / 4;
+    if(camS3 >= todayCpr.bc && camS3 <= todayCpr.tc && camR3 >= todayCpr.bc && camR3 <= todayCpr.tc){
+      results.camarilla.push({ sym, ltp, ltpUp, val: todayCpr.widthPct.toFixed(3) + '%' });
+    }
+  });
+
+  allResults = results;
+  document.getElementById('searchRow').style.display = 'flex';
+  renderAll(results);
+  showStatus('Scan complete — ' + symbols.length + ' stocks analyzed across ' + validFiles.length + ' trading days.', false);
+}
+
+function applyFOFilter(rows){
+  if(!foActive || !foSymbols) return rows;
+  return rows.filter(r => foSymbols.has(r.sym));
+}
+
+function applySearchFilter(rows){
+  const q = (document.getElementById('searchBox').value || '').trim().toUpperCase();
+  if(!q) return rows;
+  return rows.filter(r => r.sym.includes(q));
+}
+
+function renderAll(results){
+  document.getElementById('scannerGrid').style.display = 'grid';
+  renderNarrowTable(applySearchFilter(applyFOFilter(results.narrow)));
+  renderTable('tbl-trend', 'count-trend', applySearchFilter(applyFOFilter(results.trend)));
+  renderTable('tbl-reversal', 'count-reversal', applySearchFilter(applyFOFilter(results.reversal)));
+  renderTable('tbl-virgin', 'count-virgin', applySearchFilter(applyFOFilter(results.virgin)));
+  renderTable('tbl-inout', 'count-inout', applySearchFilter(applyFOFilter(results.inout)));
+  renderTable('tbl-camarilla', 'count-camarilla', applySearchFilter(applyFOFilter(results.camarilla)));
+}
+
+function applySearch(){
+  if(allResults) renderAll(allResults);
+}
+
+function renderNarrowTable(rows){
+  document.getElementById('count-narrow').textContent = rows.length;
+  const tbody = document.getElementById('tbl-narrow');
+  if(rows.length === 0){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-note">No matches</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="stock">${r.sym} <span class="badge ${r.widthLabel === 'Too Narrow' ? 'toonarrow' : 'narrow'}">${r.widthLabel}</span></td>
+      <td class="num ltp ${r.ltpUp ? 'up' : 'down'}">${fmt(r.ltp)}</td>
+      <td class="num">${fmt(r.dayHigh)}</td>
+      <td class="num">${fmt(r.dayLow)}</td>
+      <td class="num">${r.val}</td>
+    </tr>
+  `).join('');
+}
+
+function renderTable(tblId, countId, rows){
+  const tbody = document.getElementById(tblId);
+  document.getElementById(countId).textContent = rows.length;
+  if(rows.length === 0){
+    tbody.innerHTML = '<tr><td colspan="3" class="empty-note">No matches</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="stock">${r.sym}</td>
+      <td class="num ltp ${r.ltpUp ? 'up' : 'down'}">${fmt(r.ltp)}</td>
+      <td class="num">${r.val}</td>
+    </tr>
+  `).join('');
+}
+</script>
+<script>
+  var _copyYearEl = document.getElementById('copyYear');
+  if (_copyYearEl) _copyYearEl.textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
