@@ -188,10 +188,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       <div class="nav-dropdown-menu">
-        <a href="/#about">About VK</a>
-        <a href="https://wa.me/919952697792" target="_blank" rel="noopener noreferrer">Talk to VK</a>
-        <a href="/#faq">FAQs</a>
-        <a href="/#contact">Contact</a>
+        <a href="/#about" onclick="closeAboutDropdown()">About VK</a>
+        <a href="https://wa.me/919952697792" target="_blank" rel="noopener noreferrer" onclick="closeAboutDropdown()">Talk to VK</a>
+        <a href="/#faq" onclick="closeAboutDropdown()">FAQs</a>
+        <a href="/#contact" onclick="closeAboutDropdown()">Contact</a>
       </div>
     </div>
   </nav>
@@ -217,10 +217,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="mobile-about-submenu" id="mobileAboutSubmenu">
-      <a href="/#about">About VK</a>
-      <a href="https://wa.me/919952697792" target="_blank" rel="noopener noreferrer">Talk to VK</a>
-      <a href="/#faq">FAQs</a>
-      <a href="/#contact">Contact</a>
+      <a href="/#about" onclick="closeMobileMenu()">About VK</a>
+      <a href="https://wa.me/919952697792" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">Talk to VK</a>
+      <a href="/#faq" onclick="closeMobileMenu()">FAQs</a>
+      <a href="/#contact" onclick="closeMobileMenu()">Contact</a>
     </div>
   </div>
 </div>
@@ -313,6 +313,10 @@ function toggleTheme(){
 function toggleAboutDropdown(){
   document.getElementById('aboutDropdown').classList.toggle('open');
 }
+function closeAboutDropdown(){
+  var d = document.getElementById('aboutDropdown');
+  if (d) d.classList.remove('open');
+}
 function toggleMobileAbout(){
   document.getElementById('mobileAboutToggle').classList.toggle('open');
   document.getElementById('mobileAboutSubmenu').classList.toggle('open');
@@ -336,6 +340,14 @@ function toggleMobileMenu(){
   const open = menu.classList.toggle('open');
   btn.classList.toggle('open', open);
   if (open) positionMobileMenu();
+}
+function closeMobileMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  var t = document.getElementById('mobileAboutToggle');
+  var s = document.getElementById('mobileAboutSubmenu');
+  if (t) t.classList.remove('open');
+  if (s) s.classList.remove('open');
 }
 window.addEventListener('resize', () => { positionMobileMenu(); positionBody(); });
 positionBody();

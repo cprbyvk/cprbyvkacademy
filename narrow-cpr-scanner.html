@@ -332,6 +332,13 @@ react/cjs/react-jsx-runtime.production.js:
     return btn;
   }
 
+  function closeMobileMenuNav(){
+    if (mobileMenu) mobileMenu.classList.remove('open');
+    if (hamburgerBtn) { hamburgerBtn.classList.remove('open'); hamburgerBtn.innerHTML = BARS_SVG; }
+    document.querySelectorAll('.ncs-mobile-about-toggle').forEach(function(t){ t.classList.remove('open'); });
+    document.querySelectorAll('.ncs-mobile-about-submenu').forEach(function(s){ s.classList.remove('open'); });
+  }
+
   function createMobileMenu(){
     var menu = document.createElement('div');
     menu.className = 'ncs-site-menu';
@@ -364,6 +371,7 @@ react/cjs/react-jsx-runtime.production.js:
       a.href = item.href;
       a.textContent = item.label;
       if (item.ext){ a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      a.addEventListener('click', closeMobileMenuNav);
       aboutSubmenu.appendChild(a);
     });
     aboutWrap.appendChild(aboutToggle);
@@ -402,6 +410,7 @@ react/cjs/react-jsx-runtime.production.js:
       a.href = item.href;
       a.textContent = item.label;
       if (item.ext){ a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      a.addEventListener('click', function(){ dd.classList.remove('open'); });
       menu.appendChild(a);
     });
     dd.appendChild(btn);
