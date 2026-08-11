@@ -64,7 +64,7 @@
   .brand-sub{font-size:10px;color:var(--text-dim);}
   nav.main-nav{display:flex; align-items:center; gap:22px; margin-left:26px;}
   nav.main-nav a{font-size:13.5px; font-weight:600; color:var(--text-dim); white-space:nowrap;}
-  nav.main-nav a:hover{color:var(--text);}
+  nav.main-nav a:hover{color:var(--indigo);}
   .nav-dropdown{ position:relative; }
   .nav-dropdown-btn{
     display:flex; align-items:center; gap:4px; background:none; border:none; cursor:pointer;
@@ -130,9 +130,22 @@
   @media(max-width:900px){ .theme-toggle{ margin-left:auto; } }
   .theme-toggle:hover{ border-color:var(--indigo); color:var(--indigo); box-shadow:0 0 0 3px rgba(99,102,241,.18); }
   .theme-toggle svg{width:17px;height:17px;}
-  .theme-toggle .icon-moon{display:none;}
-  html[data-theme="light"] .theme-toggle .icon-sun{display:none;}
+  .theme-toggle .icon-sun{display:none;}
+  html[data-theme="light"] .theme-toggle .icon-moon{display:none;}
   html[data-theme="light"] .theme-toggle .icon-moon{display:block;}
+
+  .theme-toggle-wrap{position:relative; display:flex; align-items:center;}
+  .theme-toggle .icon-sun, .theme-toggle .icon-moon{font-size:18px; line-height:1;}
+  .theme-toggle:hover{transform:scale(1.06);}
+  .theme-tooltip{
+    position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%) translateY(-4px);
+    background:var(--grad); color:#fff; font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:7px;
+    white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .16s ease, transform .16s ease; z-index:10;
+  }
+  .theme-toggle-wrap:hover .theme-tooltip{opacity:1; transform:translateX(-50%) translateY(0);}
+  html[data-theme="light"] .theme-tooltip::before{content:"Day";}
+  html:not([data-theme="light"]) .theme-tooltip::before{content:"Night";}
+
 
   .cta-btn{
     display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:700;
@@ -337,10 +350,13 @@
       </div>
     </div>
   </nav>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">
-    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-  </button>
+  <div class="theme-toggle-wrap">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">
+      <span class="icon-sun">☀️</span>
+      <span class="icon-moon">🌙</span>
+    </button>
+    <span class="theme-tooltip"></span>
+  </div>
   <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Toggle menu" title="Menu">
     <svg class="icon-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     <svg class="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>

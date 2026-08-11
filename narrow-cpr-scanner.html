@@ -31,7 +31,16 @@
     border-color: var(--indigo, #6366F1);
     color: var(--indigo, #6366F1);
     box-shadow: 0 0 0 3px rgba(99,102,241,.18);
+    transform: scale(1.06);
   }
+  .ncs-theme-toggle-wrap { position: relative; display: flex; align-items: center; }
+  .ncs-theme-tooltip {
+    position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-4px);
+    background: linear-gradient(90deg, var(--indigo, #6366F1), var(--purple, #A855F7)); color: #fff;
+    font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 7px;
+    white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .16s ease, transform .16s ease; z-index: 10;
+  }
+  .ncs-theme-toggle-wrap:hover .ncs-theme-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
   @media (max-width: 640px) {
     .ncs-theme-toggle { width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; }
   }
@@ -44,9 +53,9 @@
   @media (max-width: 900px) { .ncs-hamburger { display: flex; } }
   .ncs-site-nav { display: flex; align-items: center; gap: 20px; margin-left: 26px; }
   @media (min-width: 901px) { .ncs-header-fixed { justify-content: center; } }
-  @media (max-width: 900px) { .ncs-theme-toggle { margin-left: auto !important; } }
+  @media (max-width: 900px) { .ncs-theme-toggle-wrap { margin-left: auto !important; } }
   .ncs-site-nav a { font-size: 13px; font-weight: 600; color: var(--text-dim, #8B8FA8); white-space: nowrap; text-decoration: none; }
-  .ncs-site-nav a:hover { color: var(--text, #E9EAF2); }
+  .ncs-site-nav a:hover { color: var(--indigo, #6366F1); }
   .ncs-nav-dropdown { position: relative; }
   .ncs-nav-dropdown-btn {
     display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer;
@@ -268,8 +277,8 @@ react/cjs/react-jsx-runtime.production.js:
   var current = 'dark';
   try { current = localStorage.getItem(STORAGE_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); } catch(e){}
 
-  var SUN_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
-  var MOON_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  var SUN_SVG = '<span style="font-size:18px;line-height:1;">☀️</span>';
+  var MOON_SVG = '<span style="font-size:18px;line-height:1;">🌙</span>';
   var BARS_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>';
   var X_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 
@@ -447,8 +456,8 @@ react/cjs/react-jsx-runtime.production.js:
     document.body.style.paddingTop = header.offsetHeight + 'px';
     // Keep our toggle button living inside the header row so it scrolls
     // (sticks) together with the brand bar instead of floating separately.
-    if (toggleBtn && toggleBtn.parentElement !== header){
-      header.appendChild(toggleBtn);
+    if (toggleWrap && toggleWrap.parentElement !== header){
+      header.appendChild(toggleWrap);
     }
     if (!hamburgerBtn){ hamburgerBtn = createHamburger(); }
     if (hamburgerBtn.parentElement !== header){ header.appendChild(hamburgerBtn); }
@@ -486,8 +495,11 @@ react/cjs/react-jsx-runtime.production.js:
   }
 
   var toggleBtn = null;
+  var toggleWrap = null;
+  var toggleTooltip = null;
   function updateIcon(){
-    if (toggleBtn) toggleBtn.innerHTML = current === 'light' ? MOON_SVG : SUN_SVG;
+    if (toggleBtn) toggleBtn.innerHTML = current === 'light' ? SUN_SVG : MOON_SVG;
+    if (toggleTooltip) toggleTooltip.textContent = current === 'light' ? 'Day' : 'Night';
   }
 
   function setTheme(name){
@@ -504,6 +516,14 @@ react/cjs/react-jsx-runtime.production.js:
     btn.setAttribute('aria-label', 'Toggle dark / light mode');
     btn.title = 'Toggle dark / light mode';
     btn.onclick = function(){ setTheme(current === 'light' ? 'dark' : 'light'); };
+    var wrap = document.createElement('div');
+    wrap.className = 'ncs-theme-toggle-wrap';
+    var tip = document.createElement('span');
+    tip.className = 'ncs-theme-tooltip';
+    wrap.appendChild(btn);
+    wrap.appendChild(tip);
+    toggleWrap = wrap;
+    toggleTooltip = tip;
     return btn;
   }
 
