@@ -62,15 +62,15 @@
   .brand-line{display:flex;flex-direction:column;align-items:center;line-height:1.15;}
   .brand-name{font-weight:700;font-size:15px;}
   .brand-sub{font-size:10px;color:var(--text-dim);}
-  nav.main-nav{display:flex; align-items:center; gap:22px; margin-left:26px;}
-  nav.main-nav a{font-size:13.5px; font-weight:600; color:var(--text-dim); white-space:nowrap;}
+  nav.main-nav{display:flex; align-items:center; gap:clamp(10px,1.6vw,22px); margin-left:clamp(10px,2vw,26px);}
+  nav.main-nav a{font-size:clamp(12px,1vw,13.5px); font-weight:600; color:var(--text-dim); white-space:nowrap;}
   nav.main-nav a:hover{color:var(--indigo);}
   .nav-dropdown{ position:relative; }
   .nav-dropdown-btn{
     display:flex; align-items:center; gap:4px; background:none; border:none; cursor:pointer;
     font-size:13.5px; font-weight:600; color:var(--text-dim); font-family:inherit; padding:0;
   }
-  .nav-dropdown-btn:hover{ color:var(--text); }
+  .nav-dropdown-btn:hover{ color:var(--indigo); }
   .nav-dropdown-btn svg{ width:12px; height:12px; transition:transform .15s ease; }
   .nav-dropdown.open .nav-dropdown-btn svg{ transform:rotate(180deg); }
   .nav-dropdown-menu{
@@ -110,14 +110,17 @@
   }
   .mobile-menu.open{display:flex;}
   .mobile-menu a{ padding:13px 4px; font-size:14.5px; font-weight:600; color:var(--text); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .mobile-menu a:hover{ color:var(--indigo); }
   .mobile-menu a:last-child{ border-bottom:none; }
   .mobile-about-toggle{width:100%;background:none;border:none;padding:13px 4px;font-size:14.5px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-family:inherit;cursor:pointer;text-align:left;}
   .mobile-about-toggle svg{width:14px;height:14px;transition:transform .15s ease;flex-shrink:0;}
   .mobile-about-toggle.open svg{transform:rotate(180deg);}
+  .mobile-about-toggle:hover{color:var(--indigo);}
   .mobile-about-submenu{display:none;flex-direction:column;padding-left:14px;}
   .mobile-about-submenu.open{display:flex;}
   .mobile-about-submenu a{padding:12px 4px;font-size:13.5px;font-weight:600;color:var(--text-dim);border-bottom:1px solid var(--border);}
   .mobile-about-submenu a:last-child{border-bottom:none;}
+  .mobile-about-submenu a:hover{color:var(--indigo);}
   .mobile-menu .soon-link{ color:var(--text-dim); }
   @media(min-width:901px){ .mobile-menu{display:none !important;} }
 
