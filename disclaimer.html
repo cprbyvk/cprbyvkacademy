@@ -128,7 +128,7 @@
   .theme-toggle svg{width:17px;height:17px;}
   .theme-toggle .icon-sun{display:none;}
   html[data-theme="light"] .theme-toggle .icon-moon{display:none;}
-  html[data-theme="light"] .theme-toggle .icon-moon{display:block;}
+  html[data-theme="light"] .theme-toggle .icon-sun{display:block;}
 
   .theme-toggle-wrap{position:relative; display:flex; align-items:center;}
   .theme-toggle .icon-sun, .theme-toggle .icon-moon{font-size:18px; line-height:1;}
@@ -138,9 +138,7 @@
     background:var(--grad); color:#fff; font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:7px;
     white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .16s ease, transform .16s ease; z-index:10;
   }
-  .theme-toggle-wrap:hover .theme-tooltip{opacity:1; transform:translateX(-50%) translateY(0);}
-  html[data-theme="light"] .theme-tooltip::before{content:"Day";}
-  html:not([data-theme="light"]) .theme-tooltip::before{content:"Night";}
+  
 
 
   /* ===== legal article layout ===== */
@@ -321,7 +319,23 @@ function toggleTheme(){
   const next = current === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', next);
   try { localStorage.setItem('cpr-legal-theme', next); } catch(e){}
+  var tip = document.querySelector('.theme-tooltip');
+  if (tip) {
+    tip.textContent = next === 'light' ? 'Day' : 'Night';
+    tip.classList.add('show');
+    clearTimeout(tip._hideTimer);
+    tip._hideTimer = setTimeout(function(){ tip.classList.remove('show'); }, 1400);
+  }
 }
+setTimeout(function(){ var tip=document.querySelector('.theme-tooltip'); if(tip){ tip.textContent = (document.documentElement.getAttribute('data-theme')==='light') ? 'Day' : 'Night'; } }, 0);
+document.addEventListener('mouseout', function(e){
+  var wrap = e.target.closest ? e.target.closest('.theme-toggle-wrap') : null;
+  if (!wrap) return;
+  if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+  var tip = wrap.querySelector('.theme-tooltip');
+  if (tip) { clearTimeout(tip._hideTimer); tip.classList.remove('show'); }
+});
+
 function toggleAboutDropdown(){
   document.getElementById('aboutDropdown').classList.toggle('open');
 }

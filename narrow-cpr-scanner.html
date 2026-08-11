@@ -40,7 +40,7 @@
     font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 7px;
     white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .16s ease, transform .16s ease; z-index: 10;
   }
-  .ncs-theme-toggle-wrap:hover .ncs-theme-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   @media (max-width: 640px) {
     .ncs-theme-toggle { width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; }
   }
@@ -502,7 +502,12 @@ react/cjs/react-jsx-runtime.production.js:
   var toggleTooltip = null;
   function updateIcon(){
     if (toggleBtn) toggleBtn.innerHTML = current === 'light' ? SUN_SVG : MOON_SVG;
-    if (toggleTooltip) toggleTooltip.textContent = current === 'light' ? 'Day' : 'Night';
+    if (toggleTooltip) {
+      toggleTooltip.textContent = current === 'light' ? 'Day' : 'Night';
+      toggleTooltip.classList.add('show');
+      clearTimeout(toggleTooltip._hideTimer);
+      toggleTooltip._hideTimer = setTimeout(function(){ toggleTooltip.classList.remove('show'); }, 1400);
+    }
   }
 
   function setTheme(name){
@@ -529,6 +534,14 @@ react/cjs/react-jsx-runtime.production.js:
     toggleTooltip = tip;
     return btn;
   }
+
+  document.addEventListener('mouseout', function(e){
+    var wrap = e.target.closest ? e.target.closest('.ncs-theme-toggle-wrap') : null;
+    if (!wrap) return;
+    if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+    var tip = wrap.querySelector('.ncs-theme-tooltip');
+    if (tip) { clearTimeout(tip._hideTimer); tip.classList.remove('show'); }
+  });
 
   function init(){
     var appRoot = findAppRoot();
