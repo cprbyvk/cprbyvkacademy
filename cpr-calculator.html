@@ -240,15 +240,12 @@
   button:disabled:hover{filter:none;}
   .dl-btn{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;}
   .dl-btn svg{flex-shrink:0;}
-  .dl-btn:hover:not(:disabled){
-    filter:none;border-color:var(--indigo);color:var(--indigo);
-    background:rgba(99,102,241,.10);
-    box-shadow:0 0 0 3px rgba(99,102,241,.12);
+  .dl-btn, .secondary-btn{
+    border:1px solid var(--indigo);background:transparent;color:var(--indigo);
+    transition:background .15s ease,color .15s ease;
   }
-  .secondary-btn:hover:not(:disabled){
-    filter:none;border-color:var(--indigo);color:var(--indigo);
-    background:rgba(99,102,241,.10);
-    box-shadow:0 0 0 3px rgba(99,102,241,.12);
+  .dl-btn:hover:not(:disabled), .secondary-btn:hover:not(:disabled){
+    filter:none;border-color:var(--indigo);background:var(--indigo);color:#FFFFFF;
   }
   @media(max-width:480px){
     .btnrow{gap:8px;}
@@ -560,7 +557,7 @@ R4 = R3 + (R2 - R1)  |   S4 = S3 - (S1 - S2)
       <a href="disclaimer">Disclaimer</a>
       <a href="grievance">Grievance</a>
     </div>
-    <p class="footer-disclaimer"><b>Disclaimer:</b> Educational content only. Not investment, trading, or financial advice. Not SEBI-registered. See the <a href="disclaimer">full disclaimer</a> for complete terms.</p>
+    <p class="footer-disclaimer"><b>Disclaimer:</b> Educational content only. Not investment, trading, or financial advice. Not SEBI-registered.<br>See the <a href="disclaimer">full disclaimer</a> for complete terms.</p>
     <p class="credit-line-footer">Inspired by CPR concepts taught by Gomathi Shankar — <a href="https://www.cprbykgs.com" target="_blank" rel="noopener noreferrer">CPR by KGS</a></p>
     <p class="footer-copyright">© <span id="copyYear">2026</span> CPR by VK · CPR by VK Academy. All rights reserved.</p>
   </footer>

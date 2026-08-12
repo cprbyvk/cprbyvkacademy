@@ -262,9 +262,11 @@
 
   /* ===== faq ===== */
   .faq-item{ border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; }
-  .faq-q{ padding:16px 18px; font-size:13.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .faq-q svg{ width:16px;height:16px; color:var(--text-dim); flex-shrink:0; transition:transform .2s ease; }
-  .faq-item.open .faq-q svg{ transform:rotate(45deg); }
+  .faq-q{ padding:16px 18px; font-size:13.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:12px; transition:color .15s ease; }
+  .faq-q:hover{ color:var(--indigo); }
+  .faq-q svg{ width:16px;height:16px; color:var(--text-dim); flex-shrink:0; transition:transform .2s ease, color .15s ease; }
+  .faq-q:hover svg{ color:var(--indigo); }
+  .faq-item.open .faq-q svg{ transform:rotate(180deg); }
   .faq-a{ max-height:0; overflow:hidden; transition:max-height .25s ease; }
   .faq-item.open .faq-a{ max-height:200px; }
   .faq-a p{ margin:0; padding:0 18px 16px; font-size:12.5px; color:var(--text-dim); line-height:1.7; }
@@ -302,12 +304,14 @@
   .connect-card .ico svg{ width:19px;height:19px; color:#fff; }
   .connect-card b{ display:block; font-size:13.5px; margin-bottom:3px; }
   .connect-card span{ font-size:11.5px; color:var(--text-dim); word-break:break-word; }
+  a.connect-card span{ color:var(--indigo); font-weight:600; text-decoration:underline; }
   .contact-card{ padding:20px; text-align:center; display:block; }
   a.contact-card:hover{ border-color:var(--indigo); }
   .contact-card .ico{ width:36px;height:36px;border-radius:9px; background:rgba(99,102,241,.12); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; }
   .contact-card .ico svg{ width:18px;height:18px; color:var(--indigo); }
   .contact-card b{ display:block; font-size:13.5px; margin-bottom:2px; }
   .contact-card span{ font-size:12px; color:var(--text-dim); }
+  a.contact-card span{ color:var(--indigo); font-weight:600; text-decoration:underline; }
 
   footer.site-footer{ border-top:1px solid var(--border); padding:26px 24px 22px; text-align:center; }
   footer.site-footer .footer-brand{ display:inline-flex; align-items:center; gap:10px; margin-bottom:14px; text-decoration:none; }
@@ -550,12 +554,6 @@
       <p>Trend Reversal, Virgin CPR, and Inside/Outside CPR scanners in one place, alongside the main Narrow CPR Scanner.</p>
       <span class="go">Open tool →</span>
     </a>
-    <div class="card tool-card soon">
-      <div class="ico" style="background:var(--panel-2);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-      <h4>More tools</h4>
-      <p>A few more free tools are in progress — this section will grow as they're ready.</p>
-      <span class="go">Coming soon</span>
-    </div>
   </div>
 </section>
 
@@ -570,7 +568,7 @@
 
 <!-- ================= ABOUT ================= -->
 <section class="section" id="about">
-  <div class="eyebrow center" style="display:block; text-align:center;"><span class="dot"></span>ABOUT</div>
+  <div class="eyebrow" style="display:flex;justify-content:center;"><span class="dot"></span>ABOUT</div>
   <h2 class="sec-title center" style="text-align:center;">Meet the <span class="accent">founder</span></h2>
   <div class="about-wrap" style="margin-top:36px;">
     <div class="about-photo">
@@ -596,7 +594,7 @@
 <section class="section center">
   <div class="eyebrow"><span class="dot"></span>CONNECT</div>
   <h2 class="sec-title">Connect with <span class="accent">VK</span></h2>
-  <p class="sec-sub">Follow CPR by VK across platforms for updates and conversations. Handle: <b style="color:var(--text);">@cprbyvk</b> everywhere.</p>
+  <p class="sec-sub" style="max-width:800px; margin-left:auto; margin-right:auto;">Follow CPR by VK across platforms for updates and conversations. Handle: <b style="color:var(--text);">@cprbyvk</b> everywhere.</p>
 </section>
 <section class="section tight">
   <div class="connect-grid">
@@ -672,7 +670,7 @@
     <a href="disclaimer">Disclaimer</a>
     <a href="grievance">Grievance</a>
   </div>
-  <p class="footer-disclaimer"><b>Disclaimer:</b> Educational content only. Not investment, trading, or financial advice. Not SEBI-registered. See the <a href="disclaimer">full disclaimer</a> for complete terms.</p>
+  <p class="footer-disclaimer"><b>Disclaimer:</b> Educational content only. Not investment, trading, or financial advice. Not SEBI-registered.<br>See the <a href="disclaimer">full disclaimer</a> for complete terms.</p>
   <p class="footer-copyright">© <span id="copyYear">2026</span> CPR by VK · CPR by VK Academy. All rights reserved.</p>
 </footer>
 
@@ -749,18 +747,25 @@ positionBody();
 (function(){
   const FAQS = [
     ['What is CPR in trading?', 'CPR (Central Pivot Range) is a market-structure indicator built from the previous session\'s High, Low and Close. It highlights a zone that often acts as support or resistance for the next session.'],
+    ['How is CPR different from traditional indicators?', 'Unlike lagging indicators, CPR is based on price structure rather than a moving average or oscillator. It gives a forward-looking framework for whether the market is likely to trend or stay in balance, before the session even opens.'],
+    ['Is this suitable for intraday trading?', 'Yes. CPR is widely used by intraday traders to identify key levels, plan entries, and manage trades — that\'s exactly what the Narrow CPR Scanner and CPR Indicator Scanner on this site are built for.'],
+    ['Can beginners learn CPR easily?', 'Yes. CPR is one of the simpler yet powerful concepts in trading, and you don\'t need prior experience to start using the free tools here. A structured beginner course is planned for the future — see "Courses" in the menu (marked Coming Soon) for updates.'],
+    ['Do I need trading experience to use these?', 'No. The CPR Calculator and Scanner are built so you can enter or upload data and read the results directly, without needing to build any spreadsheet formulas yourself.'],
     ['Are these tools really free?', 'Yes — every tool on this site is free to use, with no signup or login required.'],
     ['Is my data uploaded to a server?', 'No. Every calculation happens in your own browser. Files you upload (like NSE bhavcopy CSVs) are read locally and never sent anywhere.'],
-    ['Do I need trading experience to use these?', 'No. The CPR Calculator and Scanner are built so you can enter or upload data and read the results directly, without needing to build any spreadsheet formulas yourself.'],
     ['Where does the data come from?', 'You download official bhavcopy files directly from NSE\'s own reports page and upload them here — this site never fetches or hosts exchange data itself.'],
-    ['Is this SEBI-registered investment advice?', 'No. These are educational, self-research tools only. Nothing here is a buy/sell recommendation, and CPR by VK Academy is not a SEBI-registered advisor.']
+    ['Do you provide live trading signals or tips?', 'No. We focus on education and building your own decision-making ability — the goal is to help you become an independent, disciplined trader, not to hand you calls.'],
+    ['Is this SEBI-registered investment advice?', 'No. These are educational, self-research tools only. Nothing here is a buy/sell recommendation, and CPR by VK Academy is not a SEBI-registered advisor.'],
+    ['How is your approach different from others?', 'We focus on simplicity, structure, and discipline. Instead of overwhelming you with indicators, we teach a clear framework using CPR that works across markets and timeframes.'],
+    ['What will I learn in the CPR courses?', 'Courses aren\'t live yet — they\'re marked "Coming Soon." Once launched, they\'ll cover CPR fundamentals, market structure & trend identification, breakout and reversal strategies, intraday & swing trading using CPR, and risk management & trade planning.'],
+    ['Where are the courses hosted?', 'Once launched, courses will be hosted online and accessible anytime after enrollment, so you can learn at your own pace. Watch the "Courses" link in the menu for the launch.']
   ];
   const wrap = document.getElementById('faqList');
   FAQS.forEach(([q,a], i) => {
     const item = document.createElement('div');
     item.className = 'faq-item' + (i===0 ? ' open' : '');
     item.innerHTML = `
-      <div class="faq-q">${q}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="faq-q">${q}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
       <div class="faq-a"><p>${a}</p></div>
     `;
     item.querySelector('.faq-q').addEventListener('click', () => item.classList.toggle('open'));
