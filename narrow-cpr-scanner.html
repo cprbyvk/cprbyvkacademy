@@ -147,7 +147,7 @@ endobj
 << /Size 6 /Root 1 0 R >>
 startxref
 ${h}
-%%EOF`),new Blob(o,{type:"application/pdf"})}function I1({title:l,nextDateLabel:t,rows:a}){let{canvas:e,logicalWidth:n,logicalHeight:u}=uy({title:l,nextDateLabel:t,rows:a}),i=Ro(Ei(l,t));e.toBlob(async c=>{if(!c)return;let o=await c.arrayBuffer(),d=new Uint8Array(o),g=Kh(d,e.width,e.height,n,u);_o(g,`${i}.pdf`)},"image/jpeg",.92)}function P1({title:l,rows:t,nextDateLabel:a}){let e=bo.unparse(t.map(u=>({Stock:u.symbol,LTP:mt(u.ltp),Range:mt(u.range),TC:mt(u.tc),Pivot:mt(u.pivot),BC:mt(u.bc),"Width%":u.widthPct.toFixed(3)+"%"}))),n=Ro(Ei(l,a));_o(new Blob([e],{type:"text/csv"}),`${n}.csv`)}function TV1({title:l,rows:t,nextDateLabel:a}){let e=t.map(u=>`NSE:${u.symbol}`).join(","),n=Ro(Ei(l,a));_o(new Blob([e],{type:"text/plain"}),`${n}.txt`)}function ly({onClose:l,onPick:t,anchor:r}){return(0,f.jsxs)(f.Fragment,{children:[(0,f.jsx)("div",{onClick:l,style:{position:"fixed",inset:0,zIndex:10}}),(0,f.jsx)("div",{style:{position:"fixed",top:r?r.bottom+6:0,right:r?Math.max(8,window.innerWidth-r.right):0,zIndex:11,background:"var(--panel-2)",border:"1px solid var(--border)",borderRadius:10,boxShadow:"0 8px 24px rgba(0,0,0,0.4)",overflow:"hidden",minWidth:140},children:[["png","PNG image",jh],["pdf","PDF file",J1],["csv","CSV file",J1],["tv","TradingView",J1]].map(([a,e,n])=>(0,f.jsxs)("button",{onClick:()=>t(a),className:"ncs-btn",style:{display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",background:"transparent",border:"none",color:"var(--text)",fontSize:12.5,fontWeight:600,cursor:"pointer",textAlign:"left"},children:[(0,f.jsx)(n,{size:14,color:"var(--indigo)"})," ",e]},a))})]})}function Jh(){let[l,t]=tl("daily"),[a,e]=tl(null),[n,u]=tl(null),i=[{key:"mon",label:"Monday"},{key:"tue",label:"Tuesday"},{key:"wed",label:"Wednesday"},{key:"thu",label:"Thursday"},{key:"fri",label:"Friday"}],im=Array.from({length:23},(_mIdx,mIdx)=>({key:"d"+(mIdx+1),label:"Day "+(mIdx+1)})),c=(mv)=>(mv==="monthly"?im:i).map(v=>({...v,fileName:null,rows:null,isHoliday:!1,stale:!1})),[o,d]=tl(()=>c("daily")),g=l==="monthly"?15:3,[b,y]=tl([]),[h,p]=tl(""),[z,_]=tl(""),[r,s]=tl(!1),[m,S]=tl(!0),[E,N]=tl(()=>new Set(Vh)),[T,O]=tl("nse_derivatives_individual_securities.csv"),[C,H]=tl(!0),[Ul,Re]=tl(!0),[Ti,iy]=tl(.05),[zi,cy]=tl(.1),[xi,fy]=tl(.2),[Bn,oy]=tl(.3),[Ln,sy]=tl(""),[Ni,dy]=tl(""),[Mi,Uo]=tl("0.05"),[ya,Ho]=tl("widthPct"),[Yn,Di]=tl("asc"),[Ck,Cs]=tl(""),Bo=(v,x)=>{let M=v.meta.fields||[],G=M.map(F1),Q=La(G,Ba.symbol),sl=La(G,Ba.high),qt=La(G,Ba.low),Gn=La(G,Ba.close),jo=La(G,Ba.series),Xo=La(G,Ba.date);if(Q===-1||sl===-1||qt===-1||Gn===-1)return{rows:[],columnError:`Couldn't find Symbol/High/Low/Close columns in ${x}. Columns seen: ${M.join(", ")||"none"}`};let Oy=M[Q],Cy=M[sl],Ry=M[qt],_y=M[Gn],Qo=jo!==-1?M[jo]:null,Vo=Xo!==-1?M[Xo]:null,wo=[],Zo=0;for(let qa of v.data){let Ko=(qa[Oy]||"").toString().trim(),Jo=xo(qa[Cy]),Ri=xo(qa[Ry]),Fo=xo(qa[_y]),Uy=Qo?(qa[Qo]||"").toString().trim().toUpperCase():null,Hy=Vo?(qa[Vo]||"").toString().trim():x;if(!Ko||Jo===null||Ri===null||Fo===null||Ri<=0){Zo++;continue}wo.push({symbol:Ko,series:Uy,high:Jo,low:Ri,close:Fo,date:Hy})}return{rows:wo,skipped:Zo}},Oi=v=>/\.csv$/i.test(v.name),Lo=async v=>{if(p(""),_(""),!Oi(v)){p(`${v.name} doesn't look like a CSV file. Please select a .csv file.`);return}if(v.size>Mo){p(`${v.name} is ${Do(v.size)} MB \u2014 max file size is ${Ai} MB.`);return}try{let x=await No(v),{rows:M,columnError:G,skipped:Q}=Bo(x,v.name);if(G){p(G),y([]),e(null);return}e({name:v.name,count:M.length}),y(M),u(M[0]?.date||null),Q&&_(`Loaded ${M.length} rows from ${v.name}. Skipped ${Q} row(s) with missing/invalid price data.`)}catch{p("Couldn't parse that CSV.")}},ry=async(v,x)=>{if(p(""),_(""),!Oi(x)){p(`${x.name} doesn't look like a CSV file. Please select a .csv file.`);return}if(x.size>Mo){p(`${x.name} is ${Do(x.size)} MB \u2014 max file size is ${Ai} MB.`);return}let idx0=o.findIndex(qt=>qt.key===v),nd=DateFromName(x.name);if(nd){for(let j=idx0-1;j>=0;j--){let pj=o[j];if(pj.fileName&&!pj.isHoliday){let pd=DateFromName(pj.fileName);if(pd&&nd<=pd){p(`${x.name} (${Oo(nd)}) doesn't come after ${pj.label}'s file ${pj.fileName} (${Oo(pd)}). Upload bhavcopy files in increasing date order \u2014 earliest day first.`);return}break}}for(let j=idx0+1;j<o.length;j++){let nj=o[j];if(nj.fileName&&!nj.isHoliday){let nnd=DateFromName(nj.fileName);if(nnd&&nd>=nnd){p(`${x.name} (${Oo(nd)}) doesn't come before ${nj.label}'s file ${nj.fileName} (${Oo(nnd)}). Upload bhavcopy files in increasing date order \u2014 earliest day first.`);return}break}}}try{let M=await No(x),{rows:G,columnError:Q}=Bo(M,x.name);if(Q){p(Q);return}d(sl=>{let idx=sl.findIndex(qt=>qt.key===v),prevRows=null;for(let j=idx-1;j>=0;j--){if(sl[j].rows&&!sl[j].isHoliday){prevRows=sl[j].rows;break}}let{stale:st}=StaleCk(G,prevRows);return sl.map(qt=>qt.key===v?{...qt,fileName:x.name,rows:G,isHoliday:!1,stale:st}:qt)})}catch{p("Couldn't parse that CSV.")}},yy=v=>{d(x=>x.map(M=>M.key===v?{...M,isHoliday:!M.isHoliday,fileName:M.isHoliday?M.fileName:null,rows:M.isHoliday?M.rows:null,stale:!1}:M))},my=v=>{d(x=>x.map(M=>M.key===v?{...M,fileName:null,rows:null,stale:!1}:M))},handleFolderSelect=async(fl)=>{p("");_("");let files=Array.from(fl).filter(f=>Oi(f));let dated=files.map(f=>({file:f,date:DateFromName(f.name)})).filter(x=>x.date);if(!dated.length){p("No dated bhavcopy CSV files found in that folder \\u2014 expected names like sec_bhavdata_full_DDMMYYYY.csv.");return}dated.sort((a,b)=>a.date-b.date);let latest=dated[dated.length-1].date,targetSlots=[];if(l==="weekly"){let fri=new Date(latest);while(fri.getDay()!==5)fri.setDate(fri.getDate()-1);let mon=new Date(fri);mon.setDate(mon.getDate()-4);let byDow={};dated.forEach(it=>{if(it.date>=mon&&it.date<=fri)byDow[it.date.getDay()]=it});targetSlots=[1,2,3,4,5].map((dow,idx)=>({idx,item:byDow[dow]||null}))}else{let y=latest.getFullYear(),mIdx=latest.getMonth();let inMonth=dated.filter(it=>it.date.getFullYear()===y&&it.date.getMonth()===mIdx);targetSlots=inMonth.slice(0,o.length).map((item,idx)=>({idx,item}))}let parsedBySlot={};for(let ts of targetSlots){if(!ts.item)continue;try{let M=await No(ts.item.file),{rows:G,columnError:Q}=Bo(M,ts.item.file.name);if(Q){p(Q);return}parsedBySlot[ts.idx]={fileName:ts.item.file.name,rows:G}}catch{p(`Couldn't parse ${ts.item.file.name}.`);return}}d(sl=>{let newSl=sl.map(s=>({...s,fileName:null,rows:null,isHoliday:!1,stale:!1}));Object.keys(parsedBySlot).forEach(k=>{let i=Number(k);if(i>=newSl.length)return;let prevRows=null;for(let j=i-1;j>=0;j--){if(newSl[j].rows){prevRows=newSl[j].rows;break}}let{stale:st}=StaleCk(parsedBySlot[i].rows,prevRows);newSl[i]={...newSl[i],fileName:parsedBySlot[i].fileName,rows:parsedBySlot[i].rows,isHoliday:!1,stale:st}});if(l==="weekly")[0,1,2,3,4].forEach(i=>{if(!(i in parsedBySlot))newSl[i]={...newSl[i],isHoliday:!0}});return newSl});let cnt=Object.keys(parsedBySlot).length;_(`Loaded ${cnt} file(s) from folder into ${l==="weekly"?"Weekly":"Monthly"} slots${l==="weekly"&&cnt<5?" (missing weekday(s) auto-marked as holiday)":""}.`)},handleDailyFolderSelect=async(fl)=>{p("");_("");let files=Array.from(fl).filter(f=>Oi(f));let dated=files.map(f=>({file:f,date:DateFromName(f.name)})).filter(x=>x.date);if(!dated.length){p("No dated bhavcopy CSV files found in that folder \\u2014 expected names like sec_bhavdata_full_DDMMYYYY.csv.");return}dated.sort((a,b)=>a.date-b.date);let latest=dated[dated.length-1];await Lo(latest.file)},vt=o.filter(v=>v.rows&&!v.isHoliday),Yo=o.filter(v=>v.isHoliday),ncsMonthInfo=(()=>{if(l!=="monthly")return null;let first=o.find(s=>s.fileName&&!s.isHoliday);if(!first)return null;let dt=DateFromName(first.fileName);if(!dt)return null;let y=dt.getFullYear(),mo=dt.getMonth(),dim=new Date(y,mo+1,0).getDate(),wd=0;for(let d=1;d<=dim;d++){let dow=new Date(y,mo,d).getDay();if(dow!==0&&dow!==6)wd++}let accounted=vt.length+Yo.length,gap=wd-accounted,label=dt.toLocaleString("en-IN",{month:"long",year:"numeric"});return{weekdays:wd,accounted,gap,label}})(),vy=()=>{if(p(""),_(""),vt.length<g)return;let v=new Map;vt.forEach(G=>{G.rows.forEach(Q=>{let sl=v.get(Q.symbol);sl?(sl.high=Math.max(sl.high,Q.high),sl.low=Math.min(sl.low,Q.low),sl.close=Q.close,sl.date=Q.date):v.set(Q.symbol,{...Q})})});let x=Array.from(v.values());y(x);let M=[...vt].pop(),Sc=vt.filter(G=>G.stale).length;u(M?.rows?.[0]?.date||null),_(`Calculated ${l==="weekly"?"Weekly":"Monthly"} CPR from ${vt.length} trading day(s) (${Yo.length} marked as holiday) \u2014 ${x.length} stocks.${Sc>0?` \u26A0 ${Sc} of those day(s) looked like a stale/duplicate bhavcopy \u2014 check the flagged day(s) above and consider marking as holiday, then recalculate.`:""}`)},hy=async v=>{if(!Oi(v)){p(`${v.name} doesn't look like a CSV file. Please select a .csv file.`);return}if(v.size>Mo){p(`${v.name} is ${Do(v.size)} MB \u2014 max file size is ${Ai} MB.`);return}try{let x=await No(v),M=x.meta.fields||[],G=M.map(F1),Q=La(G,Ba.symbol);if(Q===-1){p(`Couldn't find a Symbol column in ${v.name} for the F&O list.`);return}let sl=M[Q],qt=new Set(x.data.map(Gn=>(Gn[sl]||"").toString().trim().toUpperCase()).filter(Boolean));N(qt),O(v.name),H(!1),Re(!0)}catch{p("Couldn't parse the F&O symbol list.")}},gy=v=>{let x=v.target.files?.[0];x&&Lo(x)},py=v=>{let x=v.target.files?.[0];x&&hy(x)},by=v=>{v.preventDefault(),s(!1),!(l!=="daily"||!v.dataTransfer.files?.length)&&Lo(v.dataTransfer.files[0])},Ci=()=>{y([]),e(null),d(c(l)),u(null),p(""),_("")},qo=v=>{t(v),y([]),e(null),d(c(v)),u(null),p(""),_(""),Uo(v==="weekly"?"0.10":v==="monthly"?"0.15":"0.05")},_e=Lt(()=>m?b.filter(v=>v.series===null||v.series==="EQ"):b,[b,m]),Sy=Lt(()=>E?_e.filter(v=>E.has(v.symbol.toUpperCase())).length:0,[_e,E]),Hl=Lt(()=>(Ul&&E?_e.filter(x=>E.has(x.symbol.toUpperCase())):_e).map(x=>{let M=Xh(x.high,x.low,x.close),G=x.high-x.low;return{symbol:x.symbol,series:x.series,ltp:x.close,high:x.high,low:x.low,range:G,...M,band:Qh(M.widthPct,Ti,zi,xi,Bn)}}),[_e,Ul,E,Ti,zi,xi,Bn]),ma=Lt(()=>{let v=Hl;if(Ln.trim()){let G=Ln.trim().toLowerCase();v=v.filter(Q=>Q.symbol.toLowerCase().includes(G))}let x=parseFloat(Ni),M=parseFloat(Mi);return Number.isFinite(x)&&(v=v.filter(G=>G.widthPct>=x)),Number.isFinite(M)&&(v=v.filter(G=>G.widthPct<=M)),v=[...v].sort((G,Q)=>{let sl=Yn==="asc"?1:-1;return ya==="symbol"?G.symbol.localeCompare(Q.symbol)*sl:(G[ya]-Q[ya])*sl}),v},[Hl,Ln,Ni,Mi,ya,Yn]),Ay=Lt(()=>Hl.filter(v=>v.band==="tooNarrow").length,[Hl]),Ey=Lt(()=>Hl.filter(v=>v.band==="narrow").length,[Hl]),Ty=Lt(()=>Hl.filter(v=>v.band==="medium").length,[Hl]),zy=Lt(()=>Hl.filter(v=>v.band==="wide").length,[Hl]),xy=Lt(()=>Hl.filter(v=>v.band==="tooWide").length,[Hl]),Ny=v=>{ya===v?Di(x=>x==="asc"?"desc":"asc"):(Ho(v),Di("asc"))},[Go,Ya]=tl(null),[Gr,Sr2]=tl(null),My=(v,x)=>{Ya(null);let M=Hl.filter(Q=>Q.band===v).sort((Q,sl)=>Q.widthPct-sl.widthPct);if(M.length===0)return;let G={title:`${l==="daily"?"Daily":l==="weekly"?"Weekly":"Monthly"} ${Zl[v].label} CPR Stocks`,nextDateLabel:l==="weekly"?k1(n):l==="monthly"?M1(n):W1(n),rows:M,filenamePrefix:`${l}_${v}_cpr`};x==="tv"?TV1(G):x==="pdf"?I1(G):x==="csv"?P1(G):$1(G)},Dy=v=>{if(Ya(null),ma.length===0)return;let x=[...ma].sort((G,Q)=>G.widthPct-Q.widthPct),M={title:`${l==="daily"?"Daily":l==="weekly"?"Weekly":"Monthly"} CPR Stocks`,nextDateLabel:l==="weekly"?k1(n):l==="monthly"?M1(n):W1(n),rows:x,filenamePrefix:`${l}_cpr_view`};v==="tv"?TV1(M):v==="pdf"?I1(M):v==="csv"?P1(M):$1(M)},[vk35N,vk35SetN]=tl("25"),vk35Rows=Lt(()=>[...Hl].sort((a1,b1)=>a1.widthPct-b1.widthPct).slice(0,Number(vk35N)||0),[Hl,vk35N]),vk35Export=(x)=>{Ya(null);let M=vk35Rows;if(M.length===0)return;let G={title:`${l==="daily"?"Daily":l==="weekly"?"Weekly":"Monthly"} Top ${vk35N} CPR Stocks`,nextDateLabel:l==="weekly"?k1(n):l==="monthly"?M1(n):W1(n),rows:M,filenamePrefix:`${l}_top${vk35N}_cpr`};x==="tv"?TV1(G):x==="pdf"?I1(G):x==="csv"?P1(G):$1(G)},qn=b.length>0;return(0,f.jsxs)("div",{style:{"--bg":"#0A0B12","--panel":"#12141F","--panel-2":"#181A28","--border":"#262A3D","--text":"#E9EAF2","--text-dim":"#8B8FA8","--indigo":"#6366F1","--purple":"#A855F7","--blue":"#3B82F6","--green":"#22C55E","--coral":"#F0645C","--slate":"#5B6178","--label":"#FFFFFF",fontFamily:"'Segoe UI', Inter, Roboto, -apple-system, Helvetica, Arial, sans-serif",background:"var(--bg)",color:"var(--text)",minHeight:"100%",boxSizing:"border-box"},children:[(0,f.jsx)("style",{children:`
+%%EOF`),new Blob(o,{type:"application/pdf"})}function I1({title:l,nextDateLabel:t,rows:a}){let{canvas:e,logicalWidth:n,logicalHeight:u}=uy({title:l,nextDateLabel:t,rows:a}),i=Ro(Ei(l,t));e.toBlob(async c=>{if(!c)return;let o=await c.arrayBuffer(),d=new Uint8Array(o),g=Kh(d,e.width,e.height,n,u);_o(g,`${i}.pdf`)},"image/jpeg",.92)}function P1({title:l,rows:t,nextDateLabel:a}){let e=bo.unparse(t.map(u=>({Stock:u.symbol,LTP:mt(u.ltp),Range:mt(u.range),TC:mt(u.tc),Pivot:mt(u.pivot),BC:mt(u.bc),"Width%":u.widthPct.toFixed(3)+"%"}))),n=Ro(Ei(l,a));_o(new Blob([e],{type:"text/csv"}),`${n}.csv`)}function TV1({title:l,rows:t,nextDateLabel:a}){let e=t.map(u=>`NSE:${u.symbol}`).join(","),n=Ro(Ei(l,a));_o(new Blob([e],{type:"text/plain"}),`${n}.txt`)}function ly({onClose:l,onPick:t,anchor:r}){return(0,f.jsxs)(f.Fragment,{children:[(0,f.jsx)("div",{onClick:l,style:{position:"fixed",inset:0,zIndex:10}}),(0,f.jsx)("div",{style:{position:"fixed",top:r?r.bottom+6:0,right:r?Math.max(8,window.innerWidth-r.right):0,zIndex:11,background:"var(--panel-2)",border:"1px solid var(--border)",borderRadius:10,boxShadow:"0 8px 24px rgba(0,0,0,0.4)",overflow:"hidden",minWidth:140},children:[["png","PNG image",jh],["pdf","PDF file",J1],["csv","CSV file",J1],["tv","TradingView",J1]].map(([a,e,n])=>(0,f.jsxs)("button",{onClick:()=>t(a),className:"ncs-btn",style:{display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",background:"transparent",border:"none",color:"var(--text)",fontSize:12.5,fontWeight:600,cursor:"pointer",textAlign:"left"},children:[(0,f.jsx)(n,{size:14,color:"var(--indigo)"})," ",e]},a))})]})}function Jh(){let[l,t]=tl("daily"),[a,e]=tl(null),[n,u]=tl(null),i=[{key:"mon",label:"Monday"},{key:"tue",label:"Tuesday"},{key:"wed",label:"Wednesday"},{key:"thu",label:"Thursday"},{key:"fri",label:"Friday"}],im=Array.from({length:23},(_mIdx,mIdx)=>({key:"d"+(mIdx+1),label:"Day "+(mIdx+1)})),c=(mv)=>(mv==="monthly"?im:i).map(v=>({...v,fileName:null,rows:null,isHoliday:!1,stale:!1})),[o,d]=tl(()=>c("daily")),g=l==="monthly"?15:3,[b,y]=tl([]),[h,p]=tl(""),[z,_]=tl(""),[r,s]=tl(!1),[m,S]=tl(!0),[E,N]=tl(()=>new Set(Vh)),[T,O]=tl("nse_derivatives_individual_securities.csv"),[C,H]=tl(!0),[Ul,Re]=tl(!0),[Ti,iy]=tl(.05),[zi,cy]=tl(.1),[xi,fy]=tl(.2),[Bn,oy]=tl(.3),[Ln,sy]=tl(""),[Ni,dy]=tl(""),[Mi,Uo]=tl("0.05"),[ya,Ho]=tl("widthPct"),[Yn,Di]=tl("asc"),[Ck,Cs]=tl(""),Bo=(v,x)=>{let M=v.meta.fields||[],G=M.map(F1),Q=La(G,Ba.symbol),sl=La(G,Ba.high),qt=La(G,Ba.low),Gn=La(G,Ba.close),jo=La(G,Ba.series),Xo=La(G,Ba.date);if(Q===-1||sl===-1||qt===-1||Gn===-1)return{rows:[],columnError:`Couldn't find Symbol/High/Low/Close columns in ${x}. Columns seen: ${M.join(", ")||"none"}`};let Oy=M[Q],Cy=M[sl],Ry=M[qt],_y=M[Gn],Qo=jo!==-1?M[jo]:null,Vo=Xo!==-1?M[Xo]:null,wo=[],Zo=0;for(let qa of v.data){let Ko=(qa[Oy]||"").toString().trim(),Jo=xo(qa[Cy]),Ri=xo(qa[Ry]),Fo=xo(qa[_y]),Uy=Qo?(qa[Qo]||"").toString().trim().toUpperCase():null,Hy=Vo?(qa[Vo]||"").toString().trim():x;if(!Ko||Jo===null||Ri===null||Fo===null||Ri<=0){Zo++;continue}wo.push({symbol:Ko,series:Uy,high:Jo,low:Ri,close:Fo,date:Hy})}return{rows:wo,skipped:Zo}},Oi=v=>/\.csv$/i.test(v.name),Lo=async v=>{if(p(""),_(""),!Oi(v)){p(`${v.name} doesn't look like a CSV file. Please select a .csv file.`);return}if(v.size>Mo){p(`${v.name} is ${Do(v.size)} MB \u2014 max file size is ${Ai} MB.`);return}try{let x=await No(v),{rows:M,columnError:G,skipped:Q}=Bo(x,v.name);if(G){p(G),y([]),e(null);return}e({name:v.name,count:M.length}),y(M),u(M[0]?.date||null),Q&&_(`Loaded ${M.length} rows from ${v.name}. Skipped ${Q} row(s) with missing/invalid price data.`)}catch{p("Couldn't parse that CSV.")}},ry=async(v,x)=>{if(p(""),_(""),!Oi(x)){p(`${x.name} doesn't look like a CSV file. Please select a .csv file.`);return}if(x.size>Mo){p(`${x.name} is ${Do(x.size)} MB \u2014 max file size is ${Ai} MB.`);return}let idx0=o.findIndex(qt=>qt.key===v),nd=DateFromName(x.name);if(nd){for(let j=idx0-1;j>=0;j--){let pj=o[j];if(pj.fileName&&!pj.isHoliday){let pd=DateFromName(pj.fileName);if(pd&&nd<=pd){p(`${x.name} (${Oo(nd)}) doesn't come after ${pj.label}'s file ${pj.fileName} (${Oo(pd)}). Upload bhavcopy files in increasing date order \u2014 earliest day first.`);return}break}}for(let j=idx0+1;j<o.length;j++){let nj=o[j];if(nj.fileName&&!nj.isHoliday){let nnd=DateFromName(nj.fileName);if(nnd&&nd>=nnd){p(`${x.name} (${Oo(nd)}) doesn't come before ${nj.label}'s file ${nj.fileName} (${Oo(nnd)}). Upload bhavcopy files in increasing date order \u2014 earliest day first.`);return}break}}}try{let M=await No(x),{rows:G,columnError:Q}=Bo(M,x.name);if(Q){p(Q);return}d(sl=>{let idx=sl.findIndex(qt=>qt.key===v),prevRows=null;for(let j=idx-1;j>=0;j--){if(sl[j].rows&&!sl[j].isHoliday){prevRows=sl[j].rows;break}}let{stale:st}=StaleCk(G,prevRows);return sl.map(qt=>qt.key===v?{...qt,fileName:x.name,rows:G,isHoliday:!1,stale:st}:qt)})}catch{p("Couldn't parse that CSV.")}},yy=v=>{d(x=>x.map(M=>M.key===v?{...M,isHoliday:!M.isHoliday,fileName:M.isHoliday?M.fileName:null,rows:M.isHoliday?M.rows:null,stale:!1}:M))},my=v=>{d(x=>x.map(M=>M.key===v?{...M,fileName:null,rows:null,stale:!1}:M))},handleFolderSelect=async(fl)=>{p("");_("");let files=Array.from(fl).filter(f=>Oi(f));let dated=files.map(f=>({file:f,date:DateFromName(f.name)})).filter(x=>x.date);if(!dated.length){p("No dated bhavcopy CSV files found in that folder \\u2014 expected names like sec_bhavdata_full_DDMMYYYY.csv.");return}dated.sort((a,b)=>a.date-b.date);let latest=dated[dated.length-1].date,targetSlots=[];if(l==="weekly"){let fri=new Date(latest);while(fri.getDay()!==5)fri.setDate(fri.getDate()-1);let mon=new Date(fri);mon.setDate(mon.getDate()-4);let byDow={};dated.forEach(it=>{if(it.date>=mon&&it.date<=fri)byDow[it.date.getDay()]=it});targetSlots=[1,2,3,4,5].map((dow,idx)=>({idx,item:byDow[dow]||null}))}else{let y=latest.getFullYear(),mIdx=latest.getMonth();let inMonth=dated.filter(it=>it.date.getFullYear()===y&&it.date.getMonth()===mIdx);targetSlots=inMonth.slice(0,o.length).map((item,idx)=>({idx,item}))}let parsedBySlot={};for(let ts of targetSlots){if(!ts.item)continue;try{let M=await No(ts.item.file),{rows:G,columnError:Q}=Bo(M,ts.item.file.name);if(Q){p(Q);return}parsedBySlot[ts.idx]={fileName:ts.item.file.name,rows:G}}catch{p(`Couldn't parse ${ts.item.file.name}.`);return}}d(sl=>{let newSl=sl.map(s=>({...s,fileName:null,rows:null,isHoliday:!1,stale:!1}));Object.keys(parsedBySlot).forEach(k=>{let i=Number(k);if(i>=newSl.length)return;let prevRows=null;for(let j=i-1;j>=0;j--){if(newSl[j].rows){prevRows=newSl[j].rows;break}}let{stale:st}=StaleCk(parsedBySlot[i].rows,prevRows);newSl[i]={...newSl[i],fileName:parsedBySlot[i].fileName,rows:parsedBySlot[i].rows,isHoliday:!1,stale:st}});if(l==="weekly")[0,1,2,3,4].forEach(i=>{if(!(i in parsedBySlot))newSl[i]={...newSl[i],isHoliday:!0}});return newSl});let cnt=Object.keys(parsedBySlot).length;_(`Loaded ${cnt} file(s) from folder into ${l==="weekly"?"Weekly":"Monthly"} slots${l==="weekly"&&cnt<5?" (missing weekday(s) auto-marked as holiday)":""}.`)},handleDailyFolderSelect=async(fl)=>{p("");_("");let files=Array.from(fl).filter(f=>Oi(f));let dated=files.map(f=>({file:f,date:DateFromName(f.name)})).filter(x=>x.date);if(!dated.length){p("No dated bhavcopy CSV files found in that folder \\u2014 expected names like sec_bhavdata_full_DDMMYYYY.csv.");return}dated.sort((a,b)=>a.date-b.date);let latest=dated[dated.length-1];await Lo(latest.file)},vt=o.filter(v=>v.rows&&!v.isHoliday),Yo=o.filter(v=>v.isHoliday),ncsMonthInfo=(()=>{if(l!=="monthly")return null;let first=o.find(s=>s.fileName&&!s.isHoliday);if(!first)return null;let dt=DateFromName(first.fileName);if(!dt)return null;let y=dt.getFullYear(),mo=dt.getMonth(),dim=new Date(y,mo+1,0).getDate(),wd=0;for(let d=1;d<=dim;d++){let dow=new Date(y,mo,d).getDay();if(dow!==0&&dow!==6)wd++}let accounted=vt.length+Yo.length,gap=wd-accounted,label=dt.toLocaleString("en-IN",{month:"long",year:"numeric"});return{weekdays:wd,accounted,gap,label}})(),vy=()=>{if(p(""),_(""),vt.length<g)return;let v=new Map;vt.forEach(G=>{G.rows.forEach(Q=>{let sl=v.get(Q.symbol);sl?(sl.high=Math.max(sl.high,Q.high),sl.low=Math.min(sl.low,Q.low),sl.close=Q.close,sl.date=Q.date):v.set(Q.symbol,{...Q})})});let x=Array.from(v.values());y(x);let M=[...vt].pop(),Sc=vt.filter(G=>G.stale).length;u(M?.rows?.[0]?.date||null),_(`Calculated ${l==="weekly"?"Weekly":"Monthly"} CPR from ${vt.length} trading day(s) (${Yo.length} marked as holiday) \u2014 ${x.length} stocks.${Sc>0?` \u26A0 ${Sc} of those day(s) looked like a stale/duplicate bhavcopy \u2014 check the flagged day(s) above and consider marking as holiday, then recalculate.`:""}`)},hy=async v=>{if(!Oi(v)){p(`${v.name} doesn't look like a CSV file. Please select a .csv file.`);return}if(v.size>Mo){p(`${v.name} is ${Do(v.size)} MB \u2014 max file size is ${Ai} MB.`);return}try{let x=await No(v),M=x.meta.fields||[],G=M.map(F1),Q=La(G,Ba.symbol);if(Q===-1){p(`Couldn't find a Symbol column in ${v.name} for the F&O list.`);return}let sl=M[Q],qt=new Set(x.data.map(Gn=>(Gn[sl]||"").toString().trim().toUpperCase()).filter(Boolean));N(qt),O(v.name),H(!1),Re(!0)}catch{p("Couldn't parse the F&O symbol list.")}},gy=v=>{let x=v.target.files?.[0];x&&Lo(x)},py=v=>{let x=v.target.files?.[0];x&&hy(x)},by=v=>{v.preventDefault(),s(!1),!(l!=="daily"||!v.dataTransfer.files?.length)&&Lo(v.dataTransfer.files[0])},Ci=()=>{y([]),e(null),d(c(l)),u(null),p(""),_("")},qo=v=>{t(v),y([]),e(null),d(c(v)),u(null),p(""),_(""),Uo(v==="weekly"?"0.10":v==="monthly"?"0.10":"0.05")},_e=Lt(()=>m?b.filter(v=>v.series===null||v.series==="EQ"):b,[b,m]),Sy=Lt(()=>E?_e.filter(v=>E.has(v.symbol.toUpperCase())).length:0,[_e,E]),Hl=Lt(()=>(Ul&&E?_e.filter(x=>E.has(x.symbol.toUpperCase())):_e).map(x=>{let M=Xh(x.high,x.low,x.close),G=x.high-x.low;return{symbol:x.symbol,series:x.series,ltp:x.close,high:x.high,low:x.low,range:G,...M,band:Qh(M.widthPct,Ti,zi,xi,Bn)}}),[_e,Ul,E,Ti,zi,xi,Bn]),ma=Lt(()=>{let v=Hl;if(Ln.trim()){let G=Ln.trim().toLowerCase();v=v.filter(Q=>Q.symbol.toLowerCase().includes(G))}let x=parseFloat(Ni),M=parseFloat(Mi);return Number.isFinite(x)&&(v=v.filter(G=>G.widthPct>=x)),Number.isFinite(M)&&(v=v.filter(G=>G.widthPct<=M)),v=[...v].sort((G,Q)=>{let sl=Yn==="asc"?1:-1;return ya==="symbol"?G.symbol.localeCompare(Q.symbol)*sl:(G[ya]-Q[ya])*sl}),v},[Hl,Ln,Ni,Mi,ya,Yn]),Ay=Lt(()=>Hl.filter(v=>v.band==="tooNarrow").length,[Hl]),Ey=Lt(()=>Hl.filter(v=>v.band==="narrow").length,[Hl]),Ty=Lt(()=>Hl.filter(v=>v.band==="medium").length,[Hl]),zy=Lt(()=>Hl.filter(v=>v.band==="wide").length,[Hl]),xy=Lt(()=>Hl.filter(v=>v.band==="tooWide").length,[Hl]),Ny=v=>{ya===v?Di(x=>x==="asc"?"desc":"asc"):(Ho(v),Di("asc"))},[Go,Ya]=tl(null),[Gr,Sr2]=tl(null),My=(v,x)=>{Ya(null);let M=Hl.filter(Q=>Q.band===v).sort((Q,sl)=>Q.widthPct-sl.widthPct);if(M.length===0)return;let G={title:`${l==="daily"?"Daily":l==="weekly"?"Weekly":"Monthly"} ${Zl[v].label} CPR Stocks`,nextDateLabel:l==="weekly"?k1(n):l==="monthly"?M1(n):W1(n),rows:M,filenamePrefix:`${l}_${v}_cpr`};x==="tv"?TV1(G):x==="pdf"?I1(G):x==="csv"?P1(G):$1(G)},Dy=v=>{if(Ya(null),ma.length===0)return;let x=[...ma].sort((G,Q)=>G.widthPct-Q.widthPct),M={title:`${l==="daily"?"Daily":l==="weekly"?"Weekly":"Monthly"} CPR Stocks`,nextDateLabel:l==="weekly"?k1(n):l==="monthly"?M1(n):W1(n),rows:x,filenamePrefix:`${l}_cpr_view`};v==="tv"?TV1(M):v==="pdf"?I1(M):v==="csv"?P1(M):$1(M)},[vk35N,vk35SetN]=tl("25"),vk35Rows=Lt(()=>[...Hl].sort((a1,b1)=>a1.widthPct-b1.widthPct).slice(0,Number(vk35N)||0),[Hl,vk35N]),vk35Export=(x)=>{Ya(null);let M=vk35Rows;if(M.length===0)return;let G={title:`${l==="daily"?"Daily":l==="weekly"?"Weekly":"Monthly"} Top ${vk35N} CPR Stocks`,nextDateLabel:l==="weekly"?k1(n):l==="monthly"?M1(n):W1(n),rows:M,filenamePrefix:`${l}_top${vk35N}_cpr`};x==="tv"?TV1(G):x==="pdf"?I1(G):x==="csv"?P1(G):$1(G)},qn=b.length>0;return(0,f.jsxs)("div",{style:{"--bg":"#0A0B12","--panel":"#12141F","--panel-2":"#181A28","--border":"#262A3D","--text":"#E9EAF2","--text-dim":"#8B8FA8","--indigo":"#6366F1","--purple":"#A855F7","--blue":"#3B82F6","--green":"#22C55E","--coral":"#F0645C","--slate":"#5B6178","--label":"#FFFFFF",fontFamily:"'Segoe UI', Inter, Roboto, -apple-system, Helvetica, Arial, sans-serif",background:"var(--bg)",color:"var(--text)",minHeight:"100%",boxSizing:"border-box"},children:[(0,f.jsx)("style",{children:`
         .ncs-mono { font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace; }
         .ncs-subtitle-line { white-space: nowrap; }
         @media (max-width: 640px) {
@@ -573,6 +573,7 @@ react/cjs/react-jsx-runtime.production.js:
     return avail;
   }
   var NCS_COMBO_MAX_WIDTH = 0.10;
+  var NCS_MASTER_CAP = 38;
   var ncsSortState = {};
   function ncsBandColor(v){
     if(v<=0.05) return {bg:'#0F9D46',text:'#EAFCEF'};
@@ -607,6 +608,24 @@ react/cjs/react-jsx-runtime.production.js:
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url; a.download = filenamePrefix+'.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+  function ncsCsvCell(v){
+    var s = (v===null||v===undefined) ? '' : String(v);
+    if(/[",\n]/.test(s)) s = '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  }
+  function ncsExportCSV(rows, columns, filenamePrefix){
+    if(!rows.length) return;
+    var lines = [columns.map(function(c){ return ncsCsvCell(c.label); }).join(',')];
+    rows.forEach(function(r){
+      lines.push(columns.map(function(c){ return ncsCsvCell(c.get(r)); }).join(','));
+    });
+    var blob = new Blob([lines.join('\r\n')], {type:'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filenamePrefix+'.csv';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
   }
@@ -876,6 +895,338 @@ react/cjs/react-jsx-runtime.production.js:
     wrap.appendChild(table);
     return wrap;
   }
+  function ncsBuildMasterRows(avail, avail2, avail3, cap){
+    var monthlyMap = avail.monthly, weeklyMap = avail.weekly, dailyMap = avail.daily;
+    var used = {}; var rows = []; var leftover = [];
+    var stats = {
+      Combo: {candidates:0, included:0, cutByCap:0, dedupBy:{}},
+      Streak: {candidates:0, included:0, cutByCap:0, dedupBy:{}},
+      Mon: {candidates:0, included:0, cutByCap:0, dedupBy:{}},
+      Week: {candidates:0, included:0, cutByCap:0, dedupBy:{}},
+      Daily: {candidates:0, included:0, cutByCap:0, dedupBy:{}}
+    };
+    function considerSym(sym, tag, row){
+      if(used.hasOwnProperty(sym)){
+        var claimedBy = used[sym];
+        stats[tag].dedupBy[claimedBy] = (stats[tag].dedupBy[claimedBy] || 0) + 1;
+        return;
+      }
+      used[sym] = tag;
+      var entry = { symbol: sym, tag: tag, ltp: (row && typeof row.ltp === 'number') ? row.ltp : null, widthPct: (row && typeof row.widthPct === 'number') ? row.widthPct : null };
+      if(rows.length < cap){ rows.push(entry); stats[tag].included++; }
+      else { leftover.push(entry); stats[tag].cutByCap++; }
+    }
+    function addAll(map, tag){
+      if(!map) return;
+      var syms = Object.keys(map);
+      stats[tag].candidates = syms.length;
+      syms.forEach(function(sym){ considerSym(sym, tag, map[sym]); });
+    }
+    function addSortedByWidth(map, tag){
+      if(!map) return;
+      var syms = Object.keys(map).sort(function(a,b){ return map[a].widthPct - map[b].widthPct; });
+      stats[tag].candidates = syms.length;
+      syms.forEach(function(sym){ considerSym(sym, tag, map[sym]); });
+    }
+    var tripleSyms = (monthlyMap && weeklyMap && dailyMap) ? ncsIntersect(monthlyMap, weeklyMap, dailyMap) : [];
+    var mwSyms = (monthlyMap && weeklyMap) ? ncsIntersect(monthlyMap, weeklyMap) : [];
+    var wdSyms = (weeklyMap && dailyMap) ? ncsIntersect(weeklyMap, dailyMap) : [];
+    var comboUniq = {};
+    tripleSyms.concat(mwSyms, wdSyms).forEach(function(sym){ comboUniq[sym] = true; });
+    var comboSyms = Object.keys(comboUniq);
+    stats.Combo.candidates = comboSyms.length;
+    comboSyms.forEach(function(sym){
+      var row = (monthlyMap && monthlyMap[sym]) || (weeklyMap && weeklyMap[sym]) || (dailyMap && dailyMap[sym]);
+      considerSym(sym, 'Combo', row);
+    });
+    var h0 = avail2.h0, h1 = avail2.h1, h2 = avail3.h2;
+    var twoDaySyms = (h1 && h0) ? ncsIntersect(h1, h0) : [];
+    var threeDaySyms = (h2 && h1 && h0) ? ncsIntersect(h2, h1, h0) : [];
+    var streakUniq = {};
+    twoDaySyms.concat(threeDaySyms).forEach(function(sym){ streakUniq[sym] = true; });
+    var streakSyms = Object.keys(streakUniq);
+    stats.Streak.candidates = streakSyms.length;
+    streakSyms.forEach(function(sym){
+      var row = (h0 && h0[sym]) || (h1 && h1[sym]) || (h2 && h2[sym]);
+      considerSym(sym, 'Streak', row);
+    });
+    addAll(monthlyMap, 'Mon');
+    addAll(weeklyMap, 'Week');
+    addSortedByWidth(dailyMap, 'Daily');
+    return { rows: rows, leftover: leftover, stats: stats };
+  }
+  function ncsRenderMasterCanvas(title, subtitle, rows){
+    var colDefs = [{label:'Stock', w:150, align:'left'},{label:'Source', w:100, align:'left'},{label:'LTP', w:110, align:'right'},{label:'Width%', w:110, align:'right'}];
+    var totalW = colDefs.reduce(function(s,c){return s+c.w;},0);
+    var pad = 40;
+    var canvasW = totalW + pad*2;
+    var headerH = 98, headRowH = 44, rowH = 40, footerH = 76;
+    var canvasH = headerH + headRowH + rows.length*rowH + footerH + 16;
+    var canvas = document.createElement('canvas');
+    canvas.width = canvasW*2; canvas.height = canvasH*2;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(2,2);
+    ctx.fillStyle = '#F7F8FA'; ctx.fillRect(0,0,canvasW,canvasH);
+    ctx.textBaseline = 'alphabetic';
+    var grad = ctx.createLinearGradient(pad,0,pad+620,0);
+    grad.addColorStop(0,'#6366F1'); grad.addColorStop(1,'#A855F7');
+    ctx.fillStyle = grad;
+    var fs=22; ctx.font = '700 '+fs+'px "Segoe UI", Arial, sans-serif';
+    var maxTitleW = canvasW - pad - 280;
+    while(ctx.measureText(title).width > maxTitleW && fs>14){fs--;ctx.font='700 '+fs+'px "Segoe UI", Arial, sans-serif';}
+    ctx.textAlign = 'left';
+    ctx.fillText(title, pad, 40);
+    ctx.fillStyle = '#6B7280'; ctx.font = '400 13px "Segoe UI", Arial, sans-serif';
+    ctx.fillText(subtitle, pad, 62);
+    ctx.fillText(rows.length + ' stock' + (rows.length===1?'':'s'), pad, 80);
+    (function(){
+      var iS=32, iG=8, iY=(headerH-iS)/2;
+      ctx.font='700 17px "Segoe UI", Arial, sans-serif';
+      var nameW = ctx.measureText('CPR by VK').width;
+      ctx.font='400 10px "Segoe UI", Arial, sans-serif';
+      var subW = ctx.measureText('Academy').width;
+      var textW = Math.max(nameW, subW);
+      var iX = canvasW - pad - textW - iG - iS;
+      var textX = iX + iS + iG;
+      var gI = ctx.createLinearGradient(iX,iY,iX+iS,iY+iS);
+      gI.addColorStop(0,'#6366F1'); gI.addColorStop(1,'#A855F7');
+      ctx.fillStyle = gI;
+      ctx.beginPath(); ctx.roundRect(iX,iY,iS,iS,10); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = '700 15px "Chakra Petch", Segoe UI, Arial, sans-serif';
+      ctx.textAlign='center'; ctx.fillText('VK', iX+iS/2, iY+iS/2+5);
+      ctx.textAlign='center';
+      var textCenterX = textX + textW/2;
+      ctx.fillStyle='#1F2430'; ctx.font='700 17px "Segoe UI", Arial, sans-serif';
+      ctx.fillText('CPR by VK', textCenterX, iY+15);
+      ctx.fillStyle='#8A90A3'; ctx.font='400 10px "Segoe UI", Arial, sans-serif';
+      ctx.fillText('Academy', textCenterX, iY+28);
+    })();
+    ctx.strokeStyle='#E4E6EB'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(0,headerH); ctx.lineTo(canvasW,headerH); ctx.stroke();
+    var y0 = headerH;
+    ctx.fillStyle='#F0F1F4'; ctx.fillRect(0,y0,canvasW,headRowH);
+    ctx.font='600 13px "Segoe UI", Arial, sans-serif';
+    var x = pad;
+    colDefs.forEach(function(c){
+      ctx.fillStyle='#5B6178'; ctx.textAlign=c.align;
+      var tx = c.align==='left'? x : x+c.w;
+      ctx.fillText(c.label, tx, y0+headRowH/2+5);
+      x += c.w;
+    });
+    var rowY = y0+headRowH;
+    var sourceColors = {Combo:'#A855F7', Streak:'#3B82F6', Mon:'#0F9D46', Week:'#1D8A34', Daily:'#5B6178'};
+    rows.forEach(function(r, idx){
+      if(idx%2===1){ ctx.fillStyle='#FBFBFC'; ctx.fillRect(0,rowY,canvasW,rowH); }
+      ctx.strokeStyle='#EDEEF2'; ctx.beginPath(); ctx.moveTo(0,rowY+rowH); ctx.lineTo(canvasW,rowY+rowH); ctx.stroke();
+      var cx = pad;
+      ctx.font='700 13px "Segoe UI", Arial, sans-serif';
+      ctx.fillStyle='#1F2430'; ctx.textAlign='left';
+      ctx.fillText(r.symbol, cx, rowY+rowH/2+5);
+      cx += colDefs[0].w;
+      ctx.font='700 11.5px "Segoe UI", Arial, sans-serif';
+      ctx.fillStyle = sourceColors[r.tag] || '#5B6178'; ctx.textAlign='left';
+      ctx.fillText(r.tag, cx, rowY+rowH/2+5);
+      cx += colDefs[1].w;
+      ctx.font='600 13px ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace';
+      ctx.fillStyle='#3B3F4C'; ctx.textAlign='right';
+      ctx.fillText(r.ltp!=null ? r.ltp.toFixed(2) : '\u2014', cx+colDefs[2].w, rowY+rowH/2+5);
+      cx += colDefs[2].w;
+      ctx.font='700 13px ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace';
+      ctx.fillStyle = r.widthPct!=null ? ncsBandColor(r.widthPct).bg : '#5B6178';
+      ctx.fillText(r.widthPct!=null ? r.widthPct.toFixed(2)+'%' : '\u2014', cx+colDefs[3].w, rowY+rowH/2+5);
+      rowY += rowH;
+    });
+    ctx.strokeStyle='#E4E6EB'; ctx.beginPath(); ctx.moveTo(0,rowY); ctx.lineTo(canvasW,rowY); ctx.stroke();
+    var fy = rowY+26;
+    ctx.textAlign='center';
+    ctx.font='800 12px "Segoe UI", Arial, sans-serif'; ctx.fillStyle='#4F46E5';
+    ctx.fillText('www.cprbyvk.com', canvasW/2, fy);
+    ctx.font='400 11px "Segoe UI", Arial, sans-serif'; ctx.fillStyle='#8A90A3';
+    ctx.fillText('Educational purposes only. Not investment advice.', canvasW/2, fy+18);
+    ctx.fillText('Inspired by CPR concepts taught by Gomathi Shankar \u2014 CPR by KGS', canvasW/2, fy+36);
+    return {canvas:canvas, logicalWidth:canvasW, logicalHeight:canvasH};
+  }
+  function ncsExportMasterPNG(title, subtitle, rows, prefix){
+    if(!rows.length) return;
+    var d = ncsRenderMasterCanvas(title, subtitle, rows);
+    d.canvas.toBlob(function(blob){ if(blob) ncsDownloadBlob(blob, prefix+'.png'); }, 'image/png');
+  }
+  function ncsExportMasterPDF(title, subtitle, rows, prefix){
+    if(!rows.length) return;
+    var d = ncsRenderMasterCanvas(title, subtitle, rows);
+    d.canvas.toBlob(function(blob){
+      if(!blob) return;
+      blob.arrayBuffer().then(function(buf){
+        var bytes = new Uint8Array(buf);
+        var pdfBlob = ncsBuildPDF(bytes, d.canvas.width, d.canvas.height, d.logicalWidth, d.logicalHeight);
+        ncsDownloadBlob(pdfBlob, prefix+'.pdf');
+      });
+    }, 'image/jpeg', .92);
+  }
+  function ncsMasterDateLabel(avail){
+    var order = ['daily','weekly','monthly'];
+    for(var i=0;i<order.length;i++){
+      var snap = avail[order[i]+'_snap'];
+      if(snap && snap.nextDate) return snap.nextDate;
+    }
+    return null;
+  }
+  function ncsBuildMasterSection(avail, avail2, avail3){
+    var wrap = document.createElement('div');
+    wrap.className = 'ncs-combo-section';
+    var dateLabel = ncsMasterDateLabel(avail);
+    var masterTitle = 'Top Movers Master List' + (dateLabel ? ' for ' + dateLabel : '');
+    var h = document.createElement('h4');
+    h.textContent = masterTitle;
+    wrap.appendChild(h);
+    var note = document.createElement('p');
+    note.className = 'ncs-combo-meta';
+    note.textContent = 'One deduped list for the "Top Movers by VK" TradingView indicator. Fill order: Combo \u2192 Streaks \u2192 Monthly \u2192 Weekly \u2192 Daily (tightest width% first), capped below.';
+    wrap.appendChild(note);
+    var capRow = document.createElement('div');
+    capRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;';
+    var capLabel = document.createElement('label');
+    capLabel.textContent = 'Max symbols';
+    capLabel.style.cssText = 'font-size:12.5px;font-weight:700;color:var(--text,#E9EAF2);';
+    var capInput = document.createElement('input');
+    capInput.type = 'number'; capInput.min = '1'; capInput.max = '40'; capInput.value = NCS_MASTER_CAP;
+    capInput.style.cssText = 'width:60px;background:var(--panel,#12141F);border:1px solid var(--border,#262A3D);border-radius:6px;color:var(--text,#E9EAF2);font-family:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace;font-size:13px;padding:5px 8px;';
+    var capBtn = document.createElement('button');
+    capBtn.type = 'button'; capBtn.className = 'ncs-combo-export-btn'; capBtn.textContent = 'Update';
+    capBtn.style.borderRadius = '6px'; capBtn.style.padding = '6px 14px'; capBtn.style.fontSize = '12px';
+    capBtn.onclick = function(){
+      var v = parseInt(capInput.value, 10);
+      if(!isNaN(v) && v > 0){ NCS_MASTER_CAP = Math.min(v, 40); ncsOpenComboModal(); }
+      else { capInput.value = NCS_MASTER_CAP; }
+    };
+    capRow.appendChild(capLabel); capRow.appendChild(capInput); capRow.appendChild(capBtn);
+    wrap.appendChild(capRow);
+    var built = ncsBuildMasterRows(avail, avail2, avail3, NCS_MASTER_CAP);
+    var rows = built.rows, stats = built.stats;
+    if(!rows.length){
+      var p2 = document.createElement('p');
+      p2.className = 'ncs-combo-empty';
+      p2.textContent = 'Nothing to merge yet \u2014 save some Daily, Weekly or Monthly results to Combo first.';
+      wrap.appendChild(p2);
+      return wrap;
+    }
+    var tierColors = {Combo:'#A855F7', Streak:'#3B82F6', Mon:'#0F9D46', Week:'#1D8A34', Daily:'#8B8FA8'};
+    var statsLine = document.createElement('div');
+    statsLine.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;margin:-4px 0 12px;';
+    ['Combo','Streak','Mon','Week','Daily'].forEach(function(tag){
+      var st = stats[tag];
+      var span = document.createElement('span');
+      span.style.cssText = 'color:'+tierColors[tag]+';font-weight:700;';
+      var parts = [];
+      if(tag === 'Daily'){
+        var missing = st.candidates - st.included;
+        if(missing > 0) parts.push(missing + ' cut by cap');
+      } else {
+        Object.keys(st.dedupBy).forEach(function(byTag){
+          parts.push(st.dedupBy[byTag] + ' cut by ' + byTag);
+        });
+        if(st.cutByCap > 0) parts.push(st.cutByCap + ' cut by cap');
+      }
+      var shortfall = parts.length ? ' (' + parts.join(', ') + ')' : '';
+      span.textContent = tag + ': ' + st.included + '/' + st.candidates + shortfall;
+      statsLine.appendChild(span);
+    });
+    wrap.appendChild(statsLine);
+    var actionsRow = document.createElement('div');
+    actionsRow.className = 'ncs-combo-actions';
+    var countSpan = document.createElement('span');
+    countSpan.className = 'ncs-combo-count';
+    countSpan.textContent = rows.length + ' of ' + NCS_MASTER_CAP + ' slot' + (NCS_MASTER_CAP===1?'':'s') + ' filled';
+    actionsRow.appendChild(countSpan);
+    ncsAppendMasterExportButtons(actionsRow, rows, masterTitle, '', masterTitle);
+    wrap.appendChild(actionsRow);
+    ncsAppendMasterTable(wrap, rows);
+
+    var leftover = built.leftover;
+    var balanceWrap = document.createElement('div');
+    balanceWrap.className = 'ncs-combo-section';
+    var bh = document.createElement('h4');
+    bh.textContent = 'Balance \u2014 Not in Top ' + NCS_MASTER_CAP + (dateLabel ? ' for ' + dateLabel : '');
+    balanceWrap.appendChild(bh);
+    var bnote = document.createElement('p');
+    bnote.className = 'ncs-combo-meta';
+    bnote.textContent = 'Every narrow-CPR candidate that was correctly deduped but missed the cap above \u2014 export this as a second TradingView watchlist to track separately.';
+    balanceWrap.appendChild(bnote);
+    if(!leftover.length){
+      var bEmpty = document.createElement('p');
+      bEmpty.className = 'ncs-combo-empty';
+      bEmpty.textContent = 'Nothing left over \u2014 every deduped candidate fit inside the cap.';
+      balanceWrap.appendChild(bEmpty);
+    } else {
+      var balActionsRow = document.createElement('div');
+      balActionsRow.className = 'ncs-combo-actions';
+      var balCountSpan = document.createElement('span');
+      balCountSpan.className = 'ncs-combo-count';
+      balCountSpan.textContent = leftover.length + ' stock' + (leftover.length===1?'':'s') + ' left out';
+      balActionsRow.appendChild(balCountSpan);
+      var balanceTitle = 'Balance \u2014 Not in Top ' + NCS_MASTER_CAP + (dateLabel ? ' for ' + dateLabel : '');
+      ncsAppendMasterExportButtons(balActionsRow, leftover, balanceTitle, '', balanceTitle);
+      balanceWrap.appendChild(balActionsRow);
+      ncsAppendMasterTable(balanceWrap, leftover);
+    }
+    wrap.appendChild(balanceWrap);
+    return wrap;
+  }
+  function ncsAppendMasterExportButtons(actionsRow, rows, titleStr, subStr, prefix){
+    var btnGroup = document.createElement('div');
+    btnGroup.className = 'ncs-combo-btn-group';
+    var symbols = rows.map(function(r){ return r.symbol; });
+    var pngBtn = document.createElement('button');
+    pngBtn.type='button'; pngBtn.className='ncs-combo-export-btn'; pngBtn.textContent='PNG';
+    pngBtn.onclick = function(){ ncsExportMasterPNG(titleStr, subStr, rows, prefix); };
+    btnGroup.appendChild(pngBtn);
+    var pdfBtn = document.createElement('button');
+    pdfBtn.type='button'; pdfBtn.className='ncs-combo-export-btn'; pdfBtn.textContent='PDF';
+    pdfBtn.onclick = function(){ ncsExportMasterPDF(titleStr, subStr, rows, prefix); };
+    btnGroup.appendChild(pdfBtn);
+    var tvBtn = document.createElement('button');
+    tvBtn.type='button'; tvBtn.className='ncs-combo-export-btn'; tvBtn.textContent='TradingView';
+    tvBtn.onclick = function(){ ncsExportTV(symbols, prefix); };
+    btnGroup.appendChild(tvBtn);
+    actionsRow.appendChild(btnGroup);
+  }
+  function ncsAppendMasterTable(wrap, rows){
+    var table = document.createElement('table');
+    table.className = 'ncs-combo-table';
+    var thead = document.createElement('thead');
+    var htr = document.createElement('tr');
+    ['Symbol','Source','LTP','Width%'].forEach(function(lbl){
+      var th = document.createElement('th'); th.textContent = lbl; th.style.cursor='default'; htr.appendChild(th);
+    });
+    thead.appendChild(htr); table.appendChild(thead);
+    var tbody = document.createElement('tbody');
+    var tagColors = {Combo:{bg:'rgba(168,85,247,0.18)',text:'#A855F7'}, Streak:{bg:'rgba(59,130,246,0.18)',text:'#3B82F6'}, Mon:{bg:'rgba(15,157,70,0.18)',text:'#0F9D46'}, Week:{bg:'rgba(55,204,81,0.18)',text:'#1D8A34'}, Daily:{bg:'rgba(91,97,120,0.18)',text:'#8B8FA8'}};
+    rows.forEach(function(r){
+      var tr = document.createElement('tr');
+      var tdSym = document.createElement('td'); tdSym.textContent = r.symbol; tdSym.className='ncs-combo-sym'; tr.appendChild(tdSym);
+      var tdTag = document.createElement('td');
+      var badge = document.createElement('span'); badge.className='ncs-combo-width-badge';
+      var tc = tagColors[r.tag] || tagColors.Daily;
+      badge.style.background = tc.bg; badge.style.color = tc.text;
+      badge.textContent = r.tag;
+      tdTag.appendChild(badge); tr.appendChild(tdTag);
+      var tdLtp = document.createElement('td'); tdLtp.className='ncs-combo-ltp';
+      tdLtp.textContent = r.ltp!=null ? r.ltp.toFixed(2) : '\u2014';
+      tr.appendChild(tdLtp);
+      var tdW = document.createElement('td');
+      if(r.widthPct!=null){
+        var c = ncsBandColor(r.widthPct);
+        var wb = document.createElement('span'); wb.className='ncs-combo-width-badge';
+        wb.style.background = c.bg; wb.style.color = c.text;
+        wb.textContent = r.widthPct.toFixed(2)+'%';
+        tdW.appendChild(wb);
+      } else { tdW.textContent = '\u2014'; }
+      tr.appendChild(tdW);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+  }
   function ncsOpenComboModal(){
     var widthInput = document.getElementById('ncs-combo-width-input');
     var widthHint = document.getElementById('ncs-combo-width-hint');
@@ -951,6 +1302,12 @@ react/cjs/react-jsx-runtime.production.js:
     body.appendChild(ncsBuildSection('2-Day Narrow CPR Streak', [{key:'h1',label:'Previous Save'},{key:'h0',label:'Latest Save'}], avail2, 'two_day_streak'));
     var avail3 = ncsHistoryAvail(3);
     body.appendChild(ncsBuildSection('3-Day Narrow CPR Streak', [{key:'h2',label:'2 Saves Ago'},{key:'h1',label:'Previous Save'},{key:'h0',label:'Latest Save'}], avail3, 'three_day_streak'));
+
+    var masterDivider = document.createElement('div');
+    masterDivider.style.cssText = 'margin:22px 0 10px;padding-top:14px;border-top:1px solid var(--border,#262A3D);';
+    masterDivider.innerHTML = '<span style="font-size:18px;font-weight:800;display:inline-block;background:linear-gradient(135deg,var(--indigo,#6366F1),var(--purple,#A855F7));-webkit-background-clip:text;background-clip:text;color:transparent;">Top Movers Master List</span>';
+    body.appendChild(masterDivider);
+    body.appendChild(ncsBuildMasterSection(avail, avail2, avail3));
 
     document.getElementById('ncs-combo-overlay').style.display = 'flex';
   }
