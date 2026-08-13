@@ -770,7 +770,8 @@ react/cjs/react-jsx-runtime.production.js:
       });
     }, 'image/jpeg', .92);
   }
-  function ncsBuildSection(title, mapsNeeded, avail, exportPrefix){
+  function ncsBuildSection(title, mapsNeeded, avail, exportPrefix, fileTitle){
+    var fileName = fileTitle || exportPrefix;
     var missing = mapsNeeded.filter(function(n){ return !avail[n.key]; });
     var wrap = document.createElement('div');
     wrap.className = 'ncs-combo-section';
@@ -820,17 +821,17 @@ react/cjs/react-jsx-runtime.production.js:
     var pngBtn = document.createElement('button');
     pngBtn.type='button'; pngBtn.className='ncs-combo-export-btn';
     pngBtn.textContent = 'PNG';
-    pngBtn.onclick = function(){ ncsExportComboPNG(exportTitle, exportSubtitle, mapsNeeded, rowsForExport, exportPrefix); };
+    pngBtn.onclick = function(){ ncsExportComboPNG(exportTitle, exportSubtitle, mapsNeeded, rowsForExport, fileName); };
     btnGroup.appendChild(pngBtn);
     var pdfBtn = document.createElement('button');
     pdfBtn.type='button'; pdfBtn.className='ncs-combo-export-btn';
     pdfBtn.textContent = 'PDF';
-    pdfBtn.onclick = function(){ ncsExportComboPDF(exportTitle, exportSubtitle, mapsNeeded, rowsForExport, exportPrefix); };
+    pdfBtn.onclick = function(){ ncsExportComboPDF(exportTitle, exportSubtitle, mapsNeeded, rowsForExport, fileName); };
     btnGroup.appendChild(pdfBtn);
     var exportBtn = document.createElement('button');
     exportBtn.type='button'; exportBtn.className='ncs-combo-export-btn';
     exportBtn.textContent = 'TradingView';
-    exportBtn.onclick = function(){ ncsExportTV(symbols, exportPrefix); };
+    exportBtn.onclick = function(){ ncsExportTV(symbols, fileName); };
     btnGroup.appendChild(exportBtn);
     actionsRow.appendChild(btnGroup);
     wrap.appendChild(actionsRow);
@@ -1299,9 +1300,13 @@ react/cjs/react-jsx-runtime.production.js:
     body.appendChild(historyLine);
 
     var avail2 = ncsHistoryAvail(2);
-    body.appendChild(ncsBuildSection('2-Day Narrow CPR Streak', [{key:'h1',label:'Previous Save'},{key:'h0',label:'Latest Save'}], avail2, 'two_day_streak'));
+    var streak2Date = avail2.h0_snap && avail2.h0_snap.nextDate ? avail2.h0_snap.nextDate : null;
+    var streak2Title = '2-Day Narrow CPR Streak' + (streak2Date ? ' for ' + streak2Date : '');
+    body.appendChild(ncsBuildSection(streak2Title, [{key:'h1',label:'Previous Save'},{key:'h0',label:'Latest Save'}], avail2, 'two_day_streak', streak2Title));
     var avail3 = ncsHistoryAvail(3);
-    body.appendChild(ncsBuildSection('3-Day Narrow CPR Streak', [{key:'h2',label:'2 Saves Ago'},{key:'h1',label:'Previous Save'},{key:'h0',label:'Latest Save'}], avail3, 'three_day_streak'));
+    var streak3Date = avail3.h0_snap && avail3.h0_snap.nextDate ? avail3.h0_snap.nextDate : null;
+    var streak3Title = '3-Day Narrow CPR Streak' + (streak3Date ? ' for ' + streak3Date : '');
+    body.appendChild(ncsBuildSection(streak3Title, [{key:'h2',label:'2 Saves Ago'},{key:'h1',label:'Previous Save'},{key:'h0',label:'Latest Save'}], avail3, 'three_day_streak', streak3Title));
 
     var masterDivider = document.createElement('div');
     masterDivider.style.cssText = 'margin:22px 0 10px;padding-top:14px;border-top:1px solid var(--border,#262A3D);';
