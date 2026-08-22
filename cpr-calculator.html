@@ -1486,5 +1486,70 @@ function downloadPDF(){
 })();
 </script>
 
+
+<script>
+// ---- VK Site Error Logger ----
+// Catches JS errors that would otherwise fail silently in a visitor's browser.
+// Stores the last 50 errors (shared across all pages on this domain) in
+// localStorage so they can be checked later. Type vkShowErrors() in the
+// browser console on any page of the site to see them.
+(function(){
+  var STORAGE_KEY = 'vk_site_errors';
+  var MAX_ERRORS = 50;
+
+  function saveError(errObj){
+    try{
+      var errors = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      errors.push(errObj);
+      if(errors.length > MAX_ERRORS){
+        errors = errors.slice(errors.length - MAX_ERRORS);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(errors));
+    }catch(e){ /* localStorage unavailable — fail silently */ }
+  }
+
+  window.addEventListener('error', function(e){
+    var errObj = {
+      type: 'error',
+      message: e.message,
+      source: e.filename,
+      line: e.lineno,
+      col: e.colno,
+      stack: (e.error && e.error.stack) ? e.error.stack : null,
+      page: location.pathname,
+      ua: navigator.userAgent,
+      time: new Date().toISOString()
+    };
+    console.error('[VK Site Error]', errObj);
+    saveError(errObj);
+  });
+
+  window.addEventListener('unhandledrejection', function(e){
+    var reason = e.reason;
+    var errObj = {
+      type: 'unhandledrejection',
+      message: (reason && reason.message) ? reason.message : String(reason),
+      stack: (reason && reason.stack) ? reason.stack : null,
+      page: location.pathname,
+      ua: navigator.userAgent,
+      time: new Date().toISOString()
+    };
+    console.error('[VK Site Error]', errObj);
+    saveError(errObj);
+  });
+
+  // Console helpers to review/clear captured errors
+  window.vkShowErrors = function(){
+    var errors = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    console.table(errors);
+    return errors;
+  };
+  window.vkClearErrors = function(){
+    localStorage.removeItem(STORAGE_KEY);
+    console.log('VK site error log cleared.');
+  };
+})();
+</script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d55e344ca2e2473895bc06b62678769a"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
