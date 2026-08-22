@@ -480,7 +480,6 @@ react/cjs/react-jsx-runtime.production.js:
       header.style.backfaceVisibility = 'hidden';
       header.classList.add('ncs-header-fixed');
     }
-    document.body.style.paddingTop = header.offsetHeight + 'px';
     // Keep our toggle button living inside the header row so it scrolls
     // (sticks) together with the brand bar instead of floating separately.
     if (toggleWrap && toggleWrap.parentElement !== header){
@@ -492,6 +491,11 @@ react/cjs/react-jsx-runtime.production.js:
     if (siteNav.parentElement !== header && header.children[1]){
       header.children[1].insertAdjacentElement('afterend', siteNav);
     }
+    // Measure AFTER the toggle/hamburger/nav are actually in the header —
+    // appending them can change the header's rendered height, so measuring
+    // before they're added would reserve too little space and cause a
+    // second, smaller layout shift once a later call corrects it.
+    document.body.style.paddingTop = header.offsetHeight + 'px';
     // Make the logo + brand text (header's first two children) navigate home.
     if (header.children[0] && !header.children[0].dataset.homeLink){
       header.children[0].style.cursor = 'pointer';
