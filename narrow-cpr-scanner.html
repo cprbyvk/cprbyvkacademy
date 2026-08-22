@@ -105,6 +105,27 @@
     color: var(--indigo, #6366F1); background: rgba(99,102,241,.12); padding: 2px 6px; border-radius: 8px;
   }
 </style>
+<style>
+  /* Prevents a layout jump (CLS) right after the page loads.
+     The header starts as a normal in-page element and this app's own
+     script later switches it to fixed/floating position, adding body
+     padding to compensate — but only after that script runs, causing a
+     visible late shift. This CSS applies the same fixed positioning and
+     reserved space immediately (before first paint), using the exact
+     selector pattern this app's own header-detection code already relies
+     on, so there's no gap for a visible jump. The app's own JS still runs
+     afterward and harmlessly re-applies the same values. */
+  #root > div[style*="--indigo"] > div[style*="border-bottom"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000;
+  }
+  body {
+    padding-top: 59px;
+  }
+</style>
 </head>
 <body>
 <div id="root"></div>
